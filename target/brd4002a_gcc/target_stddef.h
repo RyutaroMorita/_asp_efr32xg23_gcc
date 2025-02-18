@@ -37,7 +37,7 @@
  */
 
 /*
- *  t_stddef.hのターゲット依存部（NUCLEO_F401RE用）
+ *  t_stddef.hのターゲット依存部（xG23B 868-915 MHz 14 dBm Radio Board用）
  *
  *  このインクルードファイルは，t_stddef.hの先頭でインクルードされる．
  *  他のファイルからは直接インクルードすることはない．他のインクルード
@@ -51,7 +51,7 @@
 /*
  *  ターゲットを識別するためのマクロの定義
  */
-#define TOPPERS_NUCLEO_F401RE			/* システム略称 */
+#define TOPPERS_BRD4002A_EFR322XG23			/* システム略称 */
 
 /*
  *  チップで共通な定義

@@ -40,7 +40,7 @@
  */
 
 /*
- * ターゲット依存モジュール（NUCLEO_F401RE用）
+ * ターゲット依存モジュール（xG23B 868-915 MHz 14 dBm Radio Board用）
  */
 #include "kernel_impl.h"
 #include <sil.h>

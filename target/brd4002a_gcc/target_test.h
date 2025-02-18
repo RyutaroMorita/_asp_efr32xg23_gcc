@@ -38,7 +38,7 @@
  */
 
 /*
- *		テストプログラムのターゲット依存定義（NUCLEO_F401RE用）
+ *		テストプログラムのターゲット依存定義（xG23B 868-915 MHz 14 dBm Radio Board用）
  */
 
 #ifndef TOPPERS_TARGET_TEST_H

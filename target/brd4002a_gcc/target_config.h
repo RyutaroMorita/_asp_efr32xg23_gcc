@@ -43,13 +43,13 @@
 #define TOPPERS_TARGET_CONFIG_H
 
 /*
- * ターゲット依存部モジュール（NUCLEO_F401RE用）
+ * ターゲット依存部モジュール（xG23B 868-915 MHz 14 dBm Radio Board用）
  *
  * カーネルのターゲット依存部のインクルードファイル．kernel_impl.hのター
  * ゲット依存部の位置付けとなす．
  */
 #ifndef TOPPERS_MACRO_ONLY
-#include "stm32f4xx_nucleo.h"
+//#include "stm32f4xx_nucleo.h"
 #endif /* TOPPERS_MACRO_ONLY */
 
 /*

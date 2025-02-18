@@ -45,18 +45,21 @@
 #ifndef TOPPERS_TARGET_SERIAL_H
 #define TOPPERS_TARGET_SERIAL_H
 
+#include "em_device.h"
+
 /*
  *  シリアルポートの優先度と割り込み属性
  */
-#define INTPRI_SIO		-3				/* 割込み優先度 */
-#define INTATR_SIO		0				/* 割込み属性 */
-
-#define INHNO_SIO		(USART2_IRQn + 16)
-#define INTNO_SIO		(USART2_IRQn + 16)
+#define INHNO_SIO_TX  (USART0_TX_IRQn + 16)
+#define INTNO_SIO_TX  (USART0_TX_IRQn + 16)
+#define INHNO_SIO_RX  (USART0_RX_IRQn + 16)
+#define INTNO_SIO_RX  (USART0_RX_IRQn + 16)
+#define INTPRI_SIO    -4                    /* 割込み優先度 */
+#define INTATR_SIO    (TA_NULL)             /* 割込み属性 */
 
 /*
  *  チップ依存モジュール
  */
-#include "arm_m_gcc/stm32f4xx_stm32cube/usart.h"
+#include "arm_m_gcc/efr32xg23/usart.h"
 
 #endif /* TOPPERS_TARGET_SERIAL_H */

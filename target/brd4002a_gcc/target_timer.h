@@ -38,7 +38,7 @@
  */
 
 /*
- *  タイマドライバ（NUCLEO_F401RE用）
+ *  タイマドライバ（xG23B 868-915 MHz 14 dBm Radio Board用）
  */
 
 #ifndef TOPPERS_TARGET_TIMER_H

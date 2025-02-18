@@ -43,7 +43,7 @@
 #define TOPPERS_CHIP_CONFIG_H
 
 /*
- * ターゲット依存部モジュール（STM32F4XX_STM32CUBE用）
+ * ターゲット依存部モジュール（EFR32xG23用）
  *
  * カーネルのターゲット依存部のインクルードファイル．kernel_impl.hのター
  * ゲット依存部の位置付けとなす．
