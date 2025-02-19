@@ -63,7 +63,7 @@ $END$
 	$TAB$(FP)_kernel__start,                    /* 1 The reset handler */$NL$
 
 $FOREACH excno {2,3,...,14}$ 
-	$IF (excno == 11) && (__TARGET_ARCH_THUMB == 4) $
+	$IF (excno == 11) && ((__TARGET_ARCH_THUMB == 4) || (__TARGET_ARCH_THUMB == 5)) $
 		$TAB$(FP)(_kernel_svc_handler),        /* 11 SVCall handler */$NL$
 	$ELSE$
 		$IF (excno == 14) && (__TARGET_ARCH_THUMB == 3) $

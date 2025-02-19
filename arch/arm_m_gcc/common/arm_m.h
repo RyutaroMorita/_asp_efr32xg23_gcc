@@ -3,10 +3,12 @@
  *      Toyohashi Open Platform for Embedded Real-Time Systems/
  *      Advanced Standard Profile Kernel
  * 
- *  Copyright (C) 2008-2015 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
+ *                              Toyohashi Univ. of Technology, JAPAN
+ *  Copyright (C) 2005-2014 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
- *  上記著作権者は，以下の(1)～(4)の条件を満たす場合に限り，本ソフトウェ
+ *  上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
  *  ア（本ソフトウェアを改変したものを含む．以下同じ）を使用・複製・改
  *  変・再配布（以下，利用と呼ぶ）することを無償で許諾する．
  *  (1) 本ソフトウェアをソースコードの形で利用する場合には，上記の著作
@@ -35,7 +37,7 @@
  *  アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
  *  の責任を負わない．
  * 
- *  @(#) $Id: arm_m.h 2772 2016-03-17 01:12:22Z ertl-honda $
+ *  @(#) $Id: arm_m.h 1799 2023-04-01 00:50:30Z ertl-komori $
  */
 
 /*
@@ -44,10 +46,6 @@
 
 #ifndef ARM_M_H
 #define ARM_M_H
-
-#if !((__TARGET_ARCH_THUMB == 4) || (__TARGET_ARCH_THUMB == 3))
-#error __TARGET_ARCH_THUMB is not defined or other than 4(ARMv7)/3(ARMv6)
-#endif /* __TARGET_ARCH_THUMB == 4 */
 
 /*
  *  EPSRのTビット
@@ -60,22 +58,19 @@
 #define IPSR_ISR_NUMBER 0x1ff
 
 /*
- *  例外・割込み発生時にスタック上に積まれる保存領域のサイズ
- *  本カーネルでは例外フレームと呼ぶ
- */
-#define EXC_FRAME_SIZE         (8*4)
-
-/*
  *  例外・割込み発生時にLRに設定されるEXC_RETURNの値
  */
-#define EXC_RETURN_PSP          0x04
-#define EXC_RETURN_HANDLER_MSP  0x00
-#define EXC_RETURN_TREAD_MSP    0x09
-#define EXC_RETURN_TREAD_PSP    0x0d
+#if __TARGET_ARCH_THUMB >= 5 && ! defined(TOPPERS_ENABLE_TRUSTZONE)
+#define EXC_RETURN              0xffffffbc
+#else
+#define EXC_RETURN              0xfffffffd
+#endif
+//#define EXC_RETURN_PREFIX       0xff000000  /* core_cm33.h で定義されている */
+#define EXC_RETURN_HANDLER      0x0
+#define EXC_RETURN_THREAD       0x8
+#define EXC_RETURN_MSP          0x0
+#define EXC_RETURN_PSP          0x4
 #define EXC_RETURN_FP           0x10
-#define EXC_RETURN_FP_USED      0x00
-#define EXC_RETURN_FP_NONUSED   0x10
-#define EXC_RETURN_OTHER        0xFFFFFFE0
 
 /*
  *  CONTROLレジスタ
@@ -83,6 +78,7 @@
 #define CONTROL_PSP            0x02
 #define CONTROL_MSP            0x00
 #define CONTROL_FPCA           0x04
+#define CONTROL_INIT           CONTROL_PSP
 
 /*
  *  例外番号
@@ -92,6 +88,7 @@
 #define EXCNO_MPU         4
 #define EXCNO_BUS         5
 #define EXCNO_USAGE       6
+#define EXCNO_SECURE      7
 #define EXCNO_SVCALL     11          
 #define EXCNO_DEBUG      12
 #define EXCNO_PENDSV     14
@@ -115,24 +112,27 @@
 /*
  *  例外フレームのオフセット
  */
-#define P_EXCINF_OFFSET_EXC_RETURN  0x01
-#define P_EXCINF_OFFSET_IIPM        0x00
-#define P_EXCINF_OFFSET_XPSR        0x09
-#define P_EXCINF_OFFSET_PC          0x08
-
-#if __TARGET_ARCH_THUMB == 4
-/*
- *  Configuration Control Register(CCR)
- */
-#define CCR  0xE000ED14
-
-#define CCR_STKALIGN    0x00000200
-#define CCR_UNALIGN_TRP 0x00000008
-#endif /* __TARGET_ARCH_THUMB == 4 */
+#define P_EXCINF_OFFSET_BASEPRI     0
+#define P_EXCINF_OFFSET_EXC_RETURN  1
+#define P_EXCINF_OFFSET_PC          8
+#define P_EXCINF_OFFSET_XPSR        9
 
 /*
  *  NVIC関連
  */
+
+/*
+ *  コントロールレジスタ
+ */
+#define NVIC_INT_CTRL       0xe000ed04
+
+/*
+ *  割り込み制御と状態レジスタ
+ */
+#define NVIC_ICSR           0xE000ED04
+#define NVIC_PENDSVSET          (1 << 28)       /*  PenvSVC例外 */
+#define NVIC_PENDSTSET          (1 << 26)       /*  SYSTick例外 */
+#define NVIC_PENDSTCLR          (1 << 25)
 
 /*
  *  システムハンドラーコントロールレジスタ
@@ -142,9 +142,10 @@
 /*
  *  各例外の許可ビット
  */
-#define NVIC_SYS_HND_CTRL_USAGE 0x00040000
-#define NVIC_SYS_HND_CTRL_BUS   0x00020000
-#define NVIC_SYS_HND_CTRL_MEM   0x00010000
+#define NVIC_SYS_HND_CTRL_SECURE 0x00080000
+#define NVIC_SYS_HND_CTRL_USAGE  0x00040000
+#define NVIC_SYS_HND_CTRL_BUS    0x00020000
+#define NVIC_SYS_HND_CTRL_MEM    0x00010000
 
 /*
  *  優先度設定レジスタ
@@ -167,24 +168,17 @@
 /*
  *  割込みセットペンディングレジスタ
  */
-#define NVIC_ISER0          0xE000E200  // IRQ 0 to 31 Set-Pending Register
+#define NVIC_ISPR0          0xE000E200  // IRQ 0 to 31 Set-Pending Register
 
 /*
  *  割込みクリアペンディングレジスタ
  */
-#define NVIC_ICER0          0xE000E280  // IRQ 0 to 31 Clear-Pending Register
+#define NVIC_ICPR0          0xE000E280  // IRQ 0 to 31 Clear-Pending Register
 
 /*
  *  ベクタテーブルオフセットレジスタ
  */
 #define NVIC_VECTTBL        0xE000ED08
-
-/*
- *  割り込み制御と状態レジスタ
- */
-#define NVIC_ICSR           0xE000ED04
-#define NVIC_PENDSVSET          (1 << 28)       /*  PenvSVC例外 */
-#define NVIC_PENDSTSET          (1 << 26)       /*  SYSTick例外 */
 
 
 /*
@@ -205,38 +199,33 @@
 #define SYSTIC_TENMS     0x00ffffff
 
 /*
+ *  Configuration Control Register
+ */
+#define CCR_BASE        0xE000ED14
+#define CCR_STKALIGN    0x00000200
+#define CPACR_BASE      0xE000ED88U                            /*!< System Control Space Base Address  */
+
+/*
  * FPU関連レジスタ
  */
-#if __TARGET_ARCH_THUMB == 4
+//#define CPACR 0xE000ED88  /* core_cm33.h で定義されている */
+//#define FPCCR 0xE000EF34  /* core_cm33.h で定義されている */
 
-#define CPACR 0xE000ED88
-#define FPCCR 0xE000EF34
-
-#define CPACR_FPU_ENABLE 0x00f00000
+#define CPACR_FPU_ENABLE       0x00f00000
 #define FPCCR_NO_PRESERV       0x00000000
 #define FPCCR_NO_LAZYSTACKING  0x80000000
 #define FPCCR_LAZYSTACKING     0xC0000000
 #define FPCCR_LSPACT           0x00000001
 
-#endif /* __TARGET_ARCH_THUMB == 4 */
-
-
-#if defined(TOPPERS_CORTEX_M0) || defined(TOPPERS_CORTEX_M0PLUS)
 /*
- *  M0/M0+固有の内容
+ *  FPCCRの初期値
  */
-
-/*
- *  割込み優先度の範囲
- */
-#define TMIN_INTPRI		(-4)	/* 割込み優先度の最小値（最高値）*/
-#define TMAX_INTPRI		(-1)	/* 割込み優先度の最大値（最低値）*/
-
-/*
- *  割込み優先度のビット幅
- */
-#define TBITW_IPRI		2
-
-#endif /* defined(TOPPERS_CORTEX_M0) || defined(TOPPERS_CORTEX_M0PLUS) */
+#if defined(TOPPERS_FPU_NO_PRESERV)
+#define FPCCR_INIT FPCCR_NO_PRESERV
+#elif defined(TOPPERS_FPU_NO_LAZYSTACKING)
+#define FPCCR_INIT FPCCR_NO_LAZYSTACKING
+#elif defined(TOPPERS_FPU_LAZYSTACKING)
+#define FPCCR_INIT FPCCR_LAZYSTACKING
+#endif /* defined(TOPPERS_FPU_NO_PRESERV) */
 
 #endif  /* ARM_M_H */
