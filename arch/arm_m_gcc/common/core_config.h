@@ -255,7 +255,7 @@ extern void default_int_handler(void *p_excinf);
  *  ARMv7-MとARMv6-Mで異なる処理
  *  ARMv6-Mの処理はcore_config_armv6m.hに記述する
  */
-#if __TARGET_ARCH_THUMB == 4
+#if ((__TARGET_ARCH_THUMB == 4) || (__TARGET_ARCH_THUMB == 5))
 
 /*
  *  ARMv7-Mに関する処理
@@ -678,7 +678,7 @@ Inline bool_t
 exc_sense_intmask(void *p_excinf)
 {
 #if __TARGET_ARCH_THUMB == 3
-  const uint32_t lockFlag = ((uint32_t *)p_excinf)[P_EXCINF_OFFSET_BASEPRI] & (1 << 9);
+  const uint32_t lockFlag = ((uint32_t *)p_excinf)[P_EXCINF_OFFSET_IIPM] & (1 << 9);
   if (lockFlag) {
     /*
      * (1) カーネル内のクリティカルセクションの実行中でない
@@ -687,7 +687,7 @@ exc_sense_intmask(void *p_excinf)
     return false;
   }
 #endif /* __TARGET_ARCH_THUMB == 3 */
-  const uint32_t basepri = ((uint32_t *)p_excinf)[P_EXCINF_OFFSET_BASEPRI] & 0xFF;
+  const uint32_t basepri = ((uint32_t *)p_excinf)[P_EXCINF_OFFSET_IIPM] & 0xFF;
   if (basepri != IIPM_ENAALL) {
     /*
      * (1) カーネル内のクリティカルセクションの実行中でない
@@ -696,7 +696,7 @@ exc_sense_intmask(void *p_excinf)
      */
     return false;
   }
-  const int primask = ((uint32_t *)p_excinf)[P_EXCINF_OFFSET_BASEPRI] & (1 << 8);
+  const int primask = ((uint32_t *)p_excinf)[P_EXCINF_OFFSET_IIPM] & (1 << 8);
   if (primask) {
     /* (2) 全割込みロック状態でない */
     return false;

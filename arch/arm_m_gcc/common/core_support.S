@@ -547,7 +547,7 @@ ALABEL(ret_int_r_1)
 	 *  例外フレームにFPUのコンテキストが書き戻されていない.
 	 *  ここでFPU命令を実行して例外フレームにFPUのコンテキストを書き戻す必要がある
 	 */
-	ldr r1, =(FPCCR)
+	ldr r1, =(_FPCCR)
 	ldr r0, [r1] 
 	tst r0, #FPCCR_LSPACT
 	beq ret_int_r_1_1     /* FPCCR.LSPACT == 0ならばスキップ */ 

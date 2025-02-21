@@ -147,7 +147,7 @@ $NL$
 
 
 
-$IF __TARGET_ARCH_THUMB == 4 $
+$IF ((__TARGET_ARCH_THUMB == 4) || (__TARGET_ARCH_THUMB == 5)) $
 
 $ 
 $  割込み優先度テーブル（内部表現）

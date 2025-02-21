@@ -45,7 +45,7 @@
 #include <sil.h>
 #include "usart.h"
 #include "target_syssvc.h"
-#include "stm32f4xx_hal.h"
+//#include "stm32f4xx_hal.h"
 
 /*
  * レジスタ設定値
@@ -80,22 +80,24 @@ struct sio_port_control_block {
 SIOPCB siopcb_table[TNUM_PORT];
 
 static const uint32_t sioreg_table[TNUM_PORT] = {
-	USART1_BASE,
+//	USART1_BASE,
 #if (TNUM_PORT >= 2)
-	USART2_BASE,
+//	USART2_BASE,
 #endif
 };
 
 Inline bool_t
 sio_putready(SIOPCB* siopcb)
 {
-	return (sil_rew_mem((void*)USART_SR(siopcb->reg)) & USART_SR_TXE) != 0;
+	//return (sil_rew_mem((void*)USART_SR(siopcb->reg)) & USART_SR_TXE) != 0;
+  return false;
 }
 
 Inline bool_t
 sio_getready(SIOPCB* siopcb)
 {
-	return (sil_rew_mem((void*)USART_SR(siopcb->reg)) & USART_SR_RXNE) != 0;
+	//return (sil_rew_mem((void*)USART_SR(siopcb->reg)) & USART_SR_RXNE) != 0;
+  return false;
 }
 
 /*
@@ -104,6 +106,7 @@ sio_getready(SIOPCB* siopcb)
 void
 usart_init(ID siopid)
 {
+#if 0
 	uint32_t tmp, usartdiv, fraction;
 	uint32_t reg = sioreg_table[INDEX_PORT(siopid)];
 	uint32_t src_clock;
@@ -140,6 +143,7 @@ usart_init(ID siopid)
 
 	/* USARTの有効化 */
 	sil_orw((void*)USART_CR1(reg), USART_CR1_UE);
+#endif
 }
 
 /*
@@ -151,7 +155,7 @@ usart_term(ID siopid)
 	uint32_t reg = sioreg_table[INDEX_PORT(siopid)];
 
 	/* USARTの無効化 */
-	sil_andw((void*)USART_CR1(reg),  ~USART_CR1_UE);
+	//sil_andw((void*)USART_CR1(reg),  ~USART_CR1_UE);
 }
 
 /*
@@ -202,7 +206,7 @@ sio_cls_por(SIOPCB *p_siopcb)
  *  割込みサービスルーチン
  */
 void
-sio_isr(intptr_t exinf)
+sio_tx_isr(intptr_t exinf)
 {
 	SIOPCB* siopcb = GET_SIOPCB(exinf);
 
@@ -212,6 +216,19 @@ sio_isr(intptr_t exinf)
 	if (sio_getready(siopcb)) {
 		sio_irdy_rcv(siopcb->exinf);
 	}
+}
+
+void
+sio_rx_isr(intptr_t exinf)
+{
+  SIOPCB* siopcb = GET_SIOPCB(exinf);
+
+  if (sio_putready(siopcb)) {
+    sio_irdy_snd(siopcb->exinf);
+  }
+  if (sio_getready(siopcb)) {
+    sio_irdy_rcv(siopcb->exinf);
+  }
 }
 
 /*
@@ -252,10 +269,10 @@ sio_ena_cbr(SIOPCB *siopcb, uint_t cbrtn)
 {
 	switch (cbrtn) {
 	case SIO_RDY_SND:
-		sil_orw((void*)USART_CR1(siopcb->reg), USART_CR1_TXEIE);
+		//sil_orw((void*)USART_CR1(siopcb->reg), USART_CR1_TXEIE);
 		break;
 	case SIO_RDY_RCV:
-		sil_orw((void*)USART_CR1(siopcb->reg), USART_CR1_RXNEIE);
+		//sil_orw((void*)USART_CR1(siopcb->reg), USART_CR1_RXNEIE);
 		break;
 	default:
 		break;
@@ -270,10 +287,10 @@ sio_dis_cbr(SIOPCB *siopcb, uint_t cbrtn)
 {
 	switch (cbrtn) {
 	case SIO_RDY_SND:
-		sil_andw((void*)USART_CR1(siopcb->reg), ~USART_CR1_TXEIE);
+		//sil_andw((void*)USART_CR1(siopcb->reg), ~USART_CR1_TXEIE);
 		break;
 	case SIO_RDY_RCV:
-		sil_andw((void*)USART_CR1(siopcb->reg), ~USART_CR1_RXNEIE);
+		//sil_andw((void*)USART_CR1(siopcb->reg), ~USART_CR1_RXNEIE);
 		break;
 	default:
 		break;
@@ -290,5 +307,5 @@ sio_pol_snd_chr(char c, ID siopid)
 
 	sil_wrw_mem((void*)USART_DR(reg), c);
 
-	while ((sil_rew_mem((void*)USART_SR(reg)) & USART_SR_TXE) == 0) ;
+	//while ((sil_rew_mem((void*)USART_SR(reg)) & USART_SR_TXE) == 0) ;
 }

@@ -44,8 +44,8 @@
  */
 #include "kernel_impl.h"
 #include <sil.h>
-#include "stm32f4xx_hal.h"
-#include "stm32f4xx_nucleo.h"
+//#include "stm32f4xx_hal.h"
+//#include "stm32f4xx_nucleo.h"
 
 /*
  *  起動直後の初期化(system_stm32f4xx.c)
@@ -70,16 +70,18 @@ extern void Error_Handler(void);
 /*
  *  起動時のハードウェア初期化処理
  */
+uint32_t g_istk;
 void
 hardware_init_hook(void) {
-	SystemInit();
+	//SystemInit();
 
 	/*
 	 *  -fdata-sectionsを使用するとistkが削除され，
 	 *  cfgのパス3のチェックがエラーとなるため，
 	 *  削除されないようにする 
 	 */
-	SystemCoreClock = (uint32_t)istk;
+	//SystemCoreClock = (uint32_t)istk;
+  g_istk = (uint32_t)istk;
 }
 
 /*
@@ -92,14 +94,14 @@ target_initialize(void)
 	 *  HALによる初期化
 	 *  HAL_Init() : stm32f4xx_hal.c の内容から必要な初期化のみ呼び出す．
 	 */
-	__HAL_FLASH_INSTRUCTION_CACHE_ENABLE();
-	__HAL_FLASH_DATA_CACHE_ENABLE();
-	__HAL_FLASH_PREFETCH_BUFFER_ENABLE();
+	//__HAL_FLASH_INSTRUCTION_CACHE_ENABLE();
+	//__HAL_FLASH_DATA_CACHE_ENABLE();
+	//__HAL_FLASH_PREFETCH_BUFFER_ENABLE();
 
 	/*
 	 *  クロックの初期化
 	 */
-	SystemClock_Config();
+	//SystemClock_Config();
 
 	/*
 	 *  コア依存部の初期化
@@ -113,7 +115,7 @@ target_initialize(void)
 	/*
 	 *  UserLEDの初期化
 	 */
-	BSP_LED_Init(LED2);
+	//BSP_LED_Init(LED2);
 
 	/*
 	 *  バーナー出力用のシリアル初期化
@@ -132,11 +134,12 @@ target_exit(void)
 	while(1);
 }
 
-static UART_HandleTypeDef UartHandle;
+//static UART_HandleTypeDef UartHandle;
 
 void
 usart_early_init()
 {
+#if 0
 	GPIO_InitTypeDef  GPIO_InitStruct;
 
 	/* Enable Clock */
@@ -171,6 +174,7 @@ usart_early_init()
 	if(HAL_UART_Init(&UartHandle) != HAL_OK) {
 		Error_Handler();
 	}
+#endif
 };
 
 /*
@@ -179,11 +183,13 @@ usart_early_init()
 void
 target_fput_log(char c)
 {
+#if 0
 	char cr = '\r';
 	if (c == '\n') {
 		HAL_UART_Transmit(&UartHandle, (uint8_t *)&cr, 1, 0xFFFF); 
 	}
 	HAL_UART_Transmit(&UartHandle, (uint8_t *)&c, 1, 0xFFFF); 
+#endif
 }
 
 /*
@@ -191,12 +197,14 @@ target_fput_log(char c)
  */
 void
 Error_Handler(void){
+#if 0
 	volatile int loop;
 	BSP_LED_Init(LED2);
 	while(1){
 		for(loop = 0; loop < 0x100000; loop++);
 		BSP_LED_Toggle(LED2);
 	}
+#endif
 }
 
 #include "time_event.h"
@@ -204,6 +212,7 @@ Error_Handler(void){
 /*
  *  HAL実行用の関数
  */
+#if 0
 HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
 {
   return HAL_OK;
@@ -213,3 +222,4 @@ uint32_t HAL_GetTick(void)
 {
   return current_time;
 }
+#endif

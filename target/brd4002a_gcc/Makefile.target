@@ -37,12 +37,12 @@ LDFLAGS := $(LDFLAGS) -Wl,--gc-sections
 #
 #  カーネルに関する定義
 #
-KERNEL_DIR := $(KERNEL_DIR) $(TARGETDIR) $(TARGETDIR)/stm32fcube
+KERNEL_DIR := $(KERNEL_DIR) \
+	$(TARGETDIR)
+	
 KERNEL_ASMOBJS := $(KERNEL_ASMOBJS) start.o
-KERNEL_COBJS := $(KERNEL_COBJS) target_config.o \
-                system_stm32f4xx.o stm32f4xx_nucleo.o systemclock_config.o \
-                stm32f4xx_hal_gpio.o stm32f4xx_hal_uart.o \
-                stm32f4xx_hal_rcc.o stm32f4xx_hal_dma.o
+KERNEL_COBJS := $(KERNEL_COBJS) target_config.o
+
 KERNEL_CFLAGS := $(KERNEL_CFLAGS)
 
 #

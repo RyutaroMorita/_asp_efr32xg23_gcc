@@ -46,9 +46,9 @@
 
 #ifndef TOPPERS_MACRO_ONLY
 
-#if __TARGET_ARCH_THUMB == 4
+#if ((__TARGET_ARCH_THUMB == 4) || (__TARGET_ARCH_THUMB == 5))
 static uint32_t pre_basepri;
-#endif /* __TARGET_ARCH_THUMB == 4 */
+#endif /* ((__TARGET_ARCH_THUMB == 4) || (__TARGET_ARCH_THUMB == 5)) */
 
 /*
  *  NMIを除くすべての割込みの禁止
@@ -57,7 +57,7 @@ Inline bool_t
 TOPPERS_disint(void)
 {
 	uint32_t val;
-#if __TARGET_ARCH_THUMB == 4
+#if ((__TARGET_ARCH_THUMB == 4) || (__TARGET_ARCH_THUMB == 5))
 	Asm("mrs  %0, BASEPRI" : "=r"(val));
 	if(val != (1 << (8 - TBITW_IPRI))){
 		pre_basepri = val;
@@ -70,7 +70,7 @@ TOPPERS_disint(void)
 #else /* __TARGET_ARCH_THUMB == 3 */
 	Asm("mrs  %0, PRIMASK" : "=r"(val));
 	Asm("cpsid i":::"memory");
-#endif /* __TARGET_ARCH_THUMB == 4 */
+#endif
 
 	if (val == 1) {
 		return (true);

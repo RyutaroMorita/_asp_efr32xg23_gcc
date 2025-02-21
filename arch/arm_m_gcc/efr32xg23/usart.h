@@ -75,7 +75,8 @@ extern void sio_cls_por(SIOPCB *p_siopcb);
 /*
  *  割込みハンドラ
  */
-extern void sio_isr(intptr_t exinf);
+extern void sio_tx_isr(intptr_t exinf);
+extern void sio_rx_isr(intptr_t exinf);
 
 /*
  *  1文字送信

@@ -51,7 +51,7 @@
  *  ARMv6-MとARMv7-Mで異なるためifdefに切り分けている
  */
 
-#if __TARGET_ARCH_THUMB == 4
+#if ((__TARGET_ARCH_THUMB == 4) || (__TARGET_ARCH_THUMB == 5))
 
 volatile bool_t		lock_flag;		/* CPUロックフラグの値を保持する変数 */
 volatile uint32_t	saved_iipm;		/* 割込み優先度マスクを保存する変数 */
@@ -75,7 +75,7 @@ init_intmodel(void){
 	iipm = INT_IPM(0);
 }
 
-#endif /* __TARGET_ARCH_THUMB == 4 */
+#endif
 
 /*
  *  ベクタテーブル(kernel_cfg.c)

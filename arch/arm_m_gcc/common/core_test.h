@@ -45,7 +45,7 @@
 #ifndef TOPPERS_CORE_TEST_H
 #define TOPPERS_CORE_TEST_H
 
-#if __TARGET_ARCH_THUMB == 4
+#if ((__TARGET_ARCH_THUMB == 4) || (__TARGET_ARCH_THUMB == 5))
 #define CPUEXC1				6		/* Usage Fault */
 #define RAISE_CPU_EXCEPTION Asm("mcr p15, 0, r1, c2, c0, 0");
 #define CANNOT_RETURN_CPUEXC

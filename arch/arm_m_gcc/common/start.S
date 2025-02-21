@@ -77,7 +77,7 @@ ALABEL(_start)
 	/*
 	 *  FPUの有効化
 	 */
-	ldr  r0,=(CPACR)
+	ldr  r0,=(_CPACR)
 	ldr  r1,=(CPACR_FPU_ENABLE)
 	ldr  r2,[r0]
 	orr  r2,r2,r1    
@@ -87,21 +87,21 @@ ALABEL(_start)
 	 *  FPCAを初期化
 	 */ 
 	ldr r0, =(FPCCR_INIT)
-	ldr r1, =(FPCCR)
+	ldr r1, =(_FPCCR)
 	str r0, [r1] 
 #endif /* TOPPERS_FPU_ENABLE */
 
-#if __TARGET_ARCH_THUMB == 4
+#if ((__TARGET_ARCH_THUMB == 4) || (__TARGET_ARCH_THUMB == 5))
 	/*
 	 * CCRのSTKALIGNとUNALIGN_TRPをセット
 	 * ARMv6-MではCCRはROなため設定しない．
 	 */
-	ldr  r0,=(CCR)
+	ldr  r0,=(_CCR)
 	ldr  r1,=(CCR_STKALIGN AOR CCR_UNALIGN_TRP)
 	ldr  r2,[r0]
 	orr  r2,r2,r1    
 	str  r2,[r0]
-#endif /* __TARGET_ARCH_THUMB == 4 */
+#endif /* _((__TARGET_ARCH_THUMB == 4) || (__TARGET_ARCH_THUMB == 5)) */
 
 	/*
 	 * hardware_init_hookの呼び出し （0でない場合）
