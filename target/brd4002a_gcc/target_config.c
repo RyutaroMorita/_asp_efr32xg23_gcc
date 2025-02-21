@@ -44,6 +44,7 @@
  */
 #include "kernel_impl.h"
 #include <sil.h>
+#include "sl_system_init.h"
 //#include "stm32f4xx_hal.h"
 //#include "stm32f4xx_nucleo.h"
 
@@ -94,14 +95,7 @@ target_initialize(void)
 	 *  HALによる初期化
 	 *  HAL_Init() : stm32f4xx_hal.c の内容から必要な初期化のみ呼び出す．
 	 */
-	//__HAL_FLASH_INSTRUCTION_CACHE_ENABLE();
-	//__HAL_FLASH_DATA_CACHE_ENABLE();
-	//__HAL_FLASH_PREFETCH_BUFFER_ENABLE();
-
-	/*
-	 *  クロックの初期化
-	 */
-	//SystemClock_Config();
+  sl_system_init();
 
 	/*
 	 *  コア依存部の初期化

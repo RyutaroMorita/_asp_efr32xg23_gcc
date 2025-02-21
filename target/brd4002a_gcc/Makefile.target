@@ -7,6 +7,7 @@
 #
 BOARD = brd4002a
 CHIP  = efr32xg23
+DEVICE = EFR32ZG23
 PRC   = arm_m
 TOOL  = gcc
 SDK   = simplicity_sdk_2024.6.2
@@ -21,8 +22,20 @@ FPU_USAGE = FPU_LAZYSTACKING
 #
 INCLUDES := $(INCLUDES) \
 	-I$(TARGETDIR) \
+	-I$(TARGETDIR)/project/autogen \
+	-I$(TARGETDIR)/project/config \
+	-I$(TARGETDIR)/project/$(SDK)/hardware/board/inc \
+	-I$(TARGETDIR)/project/$(SDK)/hardware/driver/configuration_over_swo/inc \
 	-I$(TARGETDIR)/project/$(SDK)/platform/CMSIS/Core/Include \
-	-I$(TARGETDIR)/project/$(SDK)/platform/Device/SiliconLabs/EFR32ZG23/Include
+	-I$(TARGETDIR)/project/$(SDK)/platform/common/inc \
+	-I$(TARGETDIR)/project/$(SDK)/platform/Device/SiliconLabs/$(DEVICE)/Include \
+	-I$(TARGETDIR)/project/$(SDK)/platform/driver/debug/inc \
+	-I$(TARGETDIR)/project/$(SDK)/platform/emlib/inc \
+	-I$(TARGETDIR)/project/$(SDK)/platform/service/clock_manager/inc \
+	-I$(TARGETDIR)/project/$(SDK)/platform/service/device_init/inc \
+	-I$(TARGETDIR)/project/$(SDK)/platform/service/device_manager/inc \
+	-I$(TARGETDIR)/project/$(SDK)/platform/service/interrupt_manager/inc \
+	-I$(TARGETDIR)/project/$(SDK)/platform/service/system/inc
 CDEFS := $(CDEFS) -DEFR32ZG23B020F512IM48=1
 COPTS := $(COPTS)
 LDFLAGS := -nostdlib $(LDFLAGS)
@@ -38,11 +51,42 @@ LDFLAGS := $(LDFLAGS) -Wl,--gc-sections
 #  カーネルに関する定義
 #
 KERNEL_DIR := $(KERNEL_DIR) \
-	$(TARGETDIR)
-	
+	$(TARGETDIR) \
+	$(TARGETDIR)/project/autogen \
+	$(TARGETDIR)/project/$(SDK)/hardware/board/src \
+	$(TARGETDIR)/project/$(SDK)/hardware/driver/configuration_over_swo/src \
+	$(TARGETDIR)/project/$(SDK)/platform/common/src \
+	$(TARGETDIR)/project/$(SDK)/platform/Device/SiliconLabs/$(DEVICE)/Source \
+	$(TARGETDIR)/project/$(SDK)/platform/driver/debug/src \
+	$(TARGETDIR)/project/$(SDK)/platform/emlib/src \
+	$(TARGETDIR)/project/$(SDK)/platform/service/system/src \
+	$(TARGETDIR)/project/$(SDK)/platform/service/clock_manager/src \
+	$(TARGETDIR)/project/$(SDK)/platform/service/device_init/src \
+	$(TARGETDIR)/project/$(SDK)/platform/service/device_manager/clocks \
+	$(TARGETDIR)/project/$(SDK)/platform/service/interrupt_manager/src
 KERNEL_ASMOBJS := $(KERNEL_ASMOBJS) start.o
-KERNEL_COBJS := $(KERNEL_COBJS) target_config.o
-
+KERNEL_COBJS := $(KERNEL_COBJS) \
+	em_cmu.o \
+	em_emu.o \
+	em_gpio.o \
+	sl_board_control_gpio.o \
+	sl_board_default_init.o \
+	sl_board_init.o \
+	sl_clock_manager.o \
+	sl_clock_manager_hal_s2.o \
+	sl_clock_manager_init.o \
+	sl_clock_manager_init_hal_s2.o \
+	sl_core_cortexm.o \
+	sl_cos.o \
+	sl_debug_swo.o \
+	sl_device_clock_$(CHIP).o \
+	sl_device_init_dcdc_s2.o \
+	sl_device_init_emu_s2.o \
+	sl_event_handler.o \
+	sl_interrupt_manager_cortexm.o \
+	sl_system_init.o \
+	system_efr32zg23.o \
+	target_config.o
 KERNEL_CFLAGS := $(KERNEL_CFLAGS)
 
 #
@@ -59,7 +103,7 @@ GCC_TARGET = arm-none-eabi
 #
 #  リンカスクリプトの定義
 #
-LDSCRIPT = $(SRCDIR)/target/$(BOARD)_$(TOOL)/stm32f401re.ld
+LDSCRIPT = $(SRCDIR)/target/$(BOARD)_$(TOOL)/$(BOARD).ld
 
 #
 #  依存関係の定義

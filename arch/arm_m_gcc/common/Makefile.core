@@ -19,7 +19,7 @@ TOOLDIR = $(SRCDIR)/arch/$(TOOL)
 #
 #  コンパイルオプション
 #
-COPTS := $(COPTS) -mthumb 
+COPTS := $(COPTS) -mthumb -mcmse
 INCLUDES := $(INCLUDES) -I$(COREDIR) -I$(TOOLDIR)
 LDFLAGS := $(LDFLAGS) 
 CDEFS := $(CDEFS)

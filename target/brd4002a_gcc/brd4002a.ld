@@ -1,7 +1,7 @@
 MEMORY
 {
-  FLASH (rx)      : ORIGIN = 0x08000000, LENGTH = 512K
-  SRAM (xrw)      : ORIGIN = 0x20000000, LENGTH = 96K
+  FLASH (rx)      : ORIGIN = 0x08000000, LENGTH = 0x7e000
+  SRAM (xrw)      : ORIGIN = 0x20000000, LENGTH = 0x10000
 }
 
 PROVIDE(hardware_init_hook = 0);
@@ -50,6 +50,7 @@ SECTIONS
 	{
 		__bss_start  = .;
 		*(.bss)
+		*(.bss*)
 		*(COMMON)
 		. = ALIGN(4);
 	} > SRAM
