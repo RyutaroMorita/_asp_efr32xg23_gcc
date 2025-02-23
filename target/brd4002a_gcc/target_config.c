@@ -68,6 +68,11 @@ static void usart_early_init(void);
  */
 extern void Error_Handler(void);
 
+int main(void)
+{
+  sta_ker();
+}
+
 /*
  *  起動時のハードウェア初期化処理
  */

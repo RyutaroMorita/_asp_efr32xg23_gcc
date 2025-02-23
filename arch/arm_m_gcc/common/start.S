@@ -166,6 +166,7 @@ ALABEL(start_5)
 
 ALABEL(start_6)
 	bl   sta_ker
+//	bl   main
 
 ALABEL(l_end)
 	b   l_end

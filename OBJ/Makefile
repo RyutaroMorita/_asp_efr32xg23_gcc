@@ -136,7 +136,7 @@ CFG2_OUT_SRCS := kernel_cfg.h kernel_cfg.c $(CFG2_OUT_SRCS)
 #
 #  共通コンパイルオプションの定義
 #
-COPTS := $(COPTS) -g2
+COPTS := $(COPTS) -g -gdwarf-2
 ifndef OMIT_WARNING_ALL
   COPTS := $(COPTS) -Wall
 endif
@@ -338,6 +338,7 @@ $(OBJFILE): $(APPL_CFG) kernel_cfg.timestamp $(ALL_OBJS) $(LIBS_DEP)
 	$(CFG) --pass 3 --kernel asp $(INCLUDES) \
 				--rom-image $(OBJNAME).srec --symbol-table $(OBJNAME).syms \
 				-T $(TARGETDIR)/target_check.tf $(CFG_TABS) $<
+	$(SIZE) $(OBJNAME).$(OBJEXT) -A
 
 #
 #  バイナリファイルの生成
@@ -465,6 +466,7 @@ ifeq ($(TOOL),gcc)
   LD = $(GCC_TARGET_PREFIX)ld
   AR = $(GCC_TARGET_PREFIX)ar
   NM = $(GCC_TARGET_PREFIX)nm
+  SIZE = $(GCC_TARGET_PREFIX)size
   RANLIB = $(GCC_TARGET_PREFIX)ranlib
   OBJCOPY = $(GCC_TARGET_PREFIX)objcopy
   OBJDUMP = $(GCC_TARGET_PREFIX)objdump
