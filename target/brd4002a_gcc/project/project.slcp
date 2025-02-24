@@ -31,13 +31,8 @@ component:
 - {id: brd4210a}
 - {id: clock_manager}
 - {id: device_init}
-- instance: [btn0, btn1]
-  id: simple_button
-- instance: [led0, led1]
-  id: simple_led
+- {id: emlib_eusart}
 - {id: sl_system}
-- instance: [vcom]
-  id: uartdrv_usart
 define:
 - {name: DEBUG_EFM}
 ui_hints:

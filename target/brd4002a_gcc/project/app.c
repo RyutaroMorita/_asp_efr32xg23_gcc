@@ -15,24 +15,160 @@
  *
  ******************************************************************************/
 
-#include "pin_config.h"
-/*
- * これ以降は「autogen」ディレクトリ以下に生成されたコンポーネントのヘッダファイル
- * コンポーネント、ドライバの関数やインスタンスを使用するために必要
- */
-#include "sl_simple_led_instances.h"
-#include "sl_simple_button_instances.h"
-#include "sl_uartdrv_instances.h"
+#include <stdio.h>
+#include "em_device.h"
+#include "em_chip.h"
+#include "em_cmu.h"
+#include "em_emu.h"
+#include "em_eusart.h"
+#include "em_gpio.h"
+#include "sl_board_control.h"
+
+// BSP for board controller pin macros
+#include "sl_board_control_config.h"
+
+#define BSP_BCC_TXPORT  gpioPortA
+#define BSP_BCC_TXPIN   8
+#define BSP_BCC_RXPORT  gpioPortA
+#define BSP_BCC_RXPIN   9
+
+// Size of the buffer for received data
+#define BUFLEN  80
+
+// Receive data buffer
+uint8_t buffer[BUFLEN];
+
+// Current position in buffer
+uint32_t inpos = 0;
+uint32_t outpos = 0;
+
+// True while receiving data (waiting for CR or BUFLEN characters)
+bool receive = true;
+
+/**************************************************************************//**
+ * @brief
+ *    CMU initialization
+ *****************************************************************************/
+void initCMU(void)
+{
+  // Enable clock to GPIO and EUSART1
+  CMU_ClockEnable(cmuClock_GPIO, true);
+  CMU_ClockEnable(cmuClock_EUSART1, true);
+}
+
+/**************************************************************************//**
+ * @brief
+ *    GPIO initialization
+ *****************************************************************************/
+void initGPIO(void)
+{
+  // Configure the EUSART TX pin to the board controller as an output
+  GPIO_PinModeSet(BSP_BCC_TXPORT, BSP_BCC_TXPIN, gpioModePushPull, 1);
+
+  // Configure the EUSART RX pin to the board controller as an input
+  GPIO_PinModeSet(BSP_BCC_RXPORT, BSP_BCC_RXPIN, gpioModeInput, 0);
+
+  /*
+   * Configure the BCC_ENABLE pin as output and set high.  This enables
+   * the virtual COM port (VCOM) connection to the board controller and
+   * permits serial port traffic over the debug connection to the host
+   * PC.
+   *
+   * To disable the VCOM connection and use the pins on the kit
+   * expansion (EXP) header, comment out the following line.
+   */
+  GPIO_PinModeSet(SL_BOARD_ENABLE_VCOM_PORT, SL_BOARD_ENABLE_VCOM_PIN, gpioModePushPull, 1);
+}
+
+/**************************************************************************//**
+ * @brief
+ *    EUSART1 initialization
+ *****************************************************************************/
+void initEUSART1(void)
+{
+  // Default asynchronous initializer (115.2 Kbps, 8N1, no flow control)
+  EUSART_UartInit_TypeDef init = EUSART_UART_INIT_DEFAULT_HF;
+  init.baudrate = 9600;
+
+  // Route EUSART1 TX and RX to the board controller TX and RX pins
+  GPIO->EUSARTROUTE[1].TXROUTE = (BSP_BCC_TXPORT << _GPIO_EUSART_TXROUTE_PORT_SHIFT)
+      | (BSP_BCC_TXPIN << _GPIO_EUSART_TXROUTE_PIN_SHIFT);
+  GPIO->EUSARTROUTE[1].RXROUTE = (BSP_BCC_RXPORT << _GPIO_EUSART_RXROUTE_PORT_SHIFT)
+      | (BSP_BCC_RXPIN << _GPIO_EUSART_RXROUTE_PIN_SHIFT);
+
+  // Enable RX and TX signals now that they have been routed
+  GPIO->EUSARTROUTE[1].ROUTEEN = GPIO_EUSART_ROUTEEN_RXPEN | GPIO_EUSART_ROUTEEN_TXPEN;
+
+  // Configure and enable EUSART1 for high-frequency (EM0/1) operation
+  EUSART_UartInitHf(EUSART1, &init);
+
+  // Enable NVIC USART sources
+  NVIC_ClearPendingIRQ(EUSART1_RX_IRQn);
+  NVIC_EnableIRQ(EUSART1_RX_IRQn);
+  NVIC_ClearPendingIRQ(EUSART1_TX_IRQn);
+  NVIC_EnableIRQ(EUSART1_TX_IRQn);
+}
+
+/**************************************************************************//**
+ * @brief
+ *    The EUSART1 receive interrupt saves incoming characters.
+ *****************************************************************************/
+void EUSART1_RX_IRQHandler(void)
+{
+  // Get the character just received
+  buffer[inpos] = EUSART1->RXDATA;
+
+  // Exit loop on new line or buffer full
+  if ((buffer[inpos] != '\r') && (inpos < BUFLEN))
+    inpos++;
+  else
+    receive = false;   // Stop receiving on CR
+
+  /*
+   * The EUSART differs from the USART in that explicit clearing of
+   * RX interrupt flags is required even after emptying the RX FIFO.
+   */
+  EUSART_IntClear(EUSART1, EUSART_IF_RXFL);
+}
+
+/**************************************************************************//**
+ * @brief
+ *    The EUSART1 transmit interrupt outputs characters.
+ *****************************************************************************/
+void EUSART1_TX_IRQHandler(void)
+{
+  // Send a previously received character
+  if (outpos < inpos)
+  {
+    EUSART1->TXDATA = buffer[outpos++];
+
+    /*
+     * The EUSART differs from the USART in that the TX FIFO interrupt
+     * flag must be explicitly cleared even after a write to the FIFO.
+     */
+    EUSART_IntClear(EUSART1, EUSART_IF_TXFL);
+  }
+  else
+  /*
+   * Need to disable the transmit FIFO level interrupt in this IRQ
+   * handler when done or it will immediately trigger again upon exit
+   * even though there is no data left to send.
+   */
+  {
+    receive = true;   // Go back into receive when all is sent
+    EUSART_IntDisable(EUSART1, EUSART_IEN_TXFL);
+  }
+}
 
 /***************************************************************************//**
  * Initialize application.
  ******************************************************************************/
 void app_init(void)
 {
-  /*
-   * VCOM_ENABLEピンをHighにして仮想シリアルポートを有効化
-   */
-  GPIO_PinOutSet(VCOM_ENABLE_PORT, VCOM_ENABLE_PIN);
+  // Initialize GPIO and EUSART
+  initCMU();
+  initGPIO();
+  initEUSART1();
 }
 
 /***************************************************************************//**
@@ -40,47 +176,27 @@ void app_init(void)
  ******************************************************************************/
 void app_process_action(void)
 {
-  sl_button_state_t s;
-  static sl_button_state_t st0 = 0;
-  static sl_button_state_t st1 = 0;
+  // Zero out buffer
+  for (volatile uint32_t i = 0; i < BUFLEN; i++)
+    buffer[i] = 0;
 
-  /*
-   * プッシュボタン0(PB0)の処理
-   */
-  s = sl_button_btn0.get_state(&sl_button_btn0);
-  if (st0 != s) {
-    // 以前の状態から変化があった場合
-    st0 = s;
-    if (st0) { // 押されている
-        //　LED0を点灯
-        sl_simple_led_turn_on(sl_led_led0.context);
-        // PB0が押されたメッセージを送信
-        UARTDRV_TransmitB(sl_uartdrv_usart_vcom_handle, (uint8_t*)"PB0 Pushed!\r\n", 13);
-    } else { // 放されている
-        //　LED0を消灯
-        sl_simple_led_turn_off(sl_led_led0.context);
-        // PB0が放されたメッセージを送信
-        UARTDRV_TransmitB(sl_uartdrv_usart_vcom_handle, (uint8_t*)"PB0 Released!\r\n", 15);
-    }
-  }
+  // Enable receive data valid interrupt
+  EUSART_IntEnable(EUSART1, EUSART_IEN_RXFL);
 
-  /*
-   * プッシュボタン1(PB1)の処理
-   */
-  s = sl_button_btn1.get_state(&sl_button_btn1);
-  if (st1 != s) {
-    // 以前の状態から変化があった場合
-    st1 = s;
-    if (st1) { // 押されている
-        //　LED1を点灯
-        sl_simple_led_turn_on(sl_led_led1.context);
-        // PB1が押されたメッセージを送信
-        UARTDRV_TransmitB(sl_uartdrv_usart_vcom_handle, (uint8_t*)"PB1 Pushed!\r\n", 13);
-    } else { // 放されている
-        //　LED1を消灯
-        sl_simple_led_turn_off(sl_led_led1.context);
-        // PB1が放されたメッセージを送信
-        UARTDRV_TransmitB(sl_uartdrv_usart_vcom_handle, (uint8_t*)"PB1 Released!\r\n", 15);
-    }
-  }
+  // Wait in EM1 while receiving to reduce current draw
+  while (receive)
+    EMU_EnterEM1();
+
+  // Disable RX FIFO Level Interrupt
+  EUSART_IntDisable(EUSART1, EUSART_IEN_RXFL);
+
+  // Enable TX FIFO Level Interrupt
+  EUSART_IntEnable(EUSART1, EUSART_IEN_TXFL);
+
+  // Wait in EM1 while transmitting to reduce current draw
+  while (!receive)
+    EMU_EnterEM1();
+
+  // Reset buffer indices
+  inpos = outpos = 0;
 }
