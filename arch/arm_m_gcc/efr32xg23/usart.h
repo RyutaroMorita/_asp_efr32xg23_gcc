@@ -38,7 +38,7 @@
  */
 
 /*
- *  シリアルI/Oデバイス（SIO）ドライバ（STM32F USART用）
+ *  シリアルI/Oデバイス（SIO）ドライバ（EFR32xG23用）
  */
 
 #ifndef TOPPERS_USART_H
@@ -63,6 +63,11 @@ typedef struct sio_port_control_block    SIOPCB;
 extern void sio_initialize(intptr_t exinf);
 
 /*
+ * カーネル起動時のバナー出力用の初期化
+ */
+extern void sio_uart_init(ID siopid, uint32_t bitrate);
+
+/*
  *  シリアルオープン
  */
 extern SIOPCB *sio_opn_por(ID siopid, intptr_t exinf);
@@ -70,7 +75,7 @@ extern SIOPCB *sio_opn_por(ID siopid, intptr_t exinf);
 /*
  *  シリアルクローズ
  */
-extern void sio_cls_por(SIOPCB *p_siopcb);
+extern void sio_cls_por(SIOPCB* p_siopcb);
 
 /*
  *  割込みハンドラ
@@ -81,22 +86,22 @@ extern void sio_rx_isr(intptr_t exinf);
 /*
  *  1文字送信
  */
-extern bool_t sio_snd_chr(SIOPCB *siopcb, char c);
+extern bool_t sio_snd_chr(SIOPCB* p_siopcb, char c);
 
 /*
  *  1文字受信
  */
-extern int_t sio_rcv_chr(SIOPCB *siopcb);
+extern int_t sio_rcv_chr(SIOPCB* p_siopcb);
 
 /*
  *  コールバックの許可
  */
-extern void sio_ena_cbr(SIOPCB *siopcb, uint_t cbrtn);
+extern void sio_ena_cbr(SIOPCB* p_siopcb, uint_t cbrtn);
 
 /* 
  *  コールバックの禁止
  */
-extern void sio_dis_cbr(SIOPCB *siopcb, uint_t cbrtn);
+extern void sio_dis_cbr(SIOPCB* p_siopcb, uint_t cbrtn);
 
 /*
  *  送信可能コールバック

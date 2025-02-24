@@ -50,7 +50,7 @@
 /*
  *  起動メッセージのターゲットシステム名
  */
-#define TARGET_NAME    "NUCLEO(STM32F401RE)"
+#define TARGET_NAME    "BRD4002A + EFR32ZG23"
 
 /*
  *  システムログの低レベル出力のための文字出力
@@ -63,17 +63,17 @@ extern void	target_fput_log(char c);
  *  シリアルポート数の定義
  */
 #define TNUM_PORT        (2)		/* サポートするシリアルポートの数 */
-#define TNUM_SIOP        (2)
 
 /*
  *  ログタスクが使用するポートID
  */
-#define LOGTASK_PORTID   SIO_PORTID
+//#define LOGTASK_PORTID   SIO_PORTID
+#define LOGTASK_PORTID   2
 
 /*  
  *  ボーレート
  */
-#define BPS_SETTING		(115200)
+#define BPS_SETTING		(9600)
 
 /*
  *  システムログタスク関連の定数の定義
@@ -84,6 +84,6 @@ extern void	target_fput_log(char c);
 /*
  *  チップ共有のハードウェア資源の読み込み
  */
-#include "arm_m_gcc/stm32f4xx_stm32cube/chip_syssvc.h"
+#include "arm_m_gcc/efr32xg23/chip_syssvc.h"
 
 #endif /* TOPPERS_TARGET_SYSSVC_H */

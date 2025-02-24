@@ -30,14 +30,7 @@ INCLUDES := $(INCLUDES) \
 	-I$(TARGETDIR)/project/$(SDK)/platform/CMSIS/Core/Include \
 	-I$(TARGETDIR)/project/$(SDK)/platform/common/inc \
 	-I$(TARGETDIR)/project/$(SDK)/platform/Device/SiliconLabs/$(DEVICE)/Include \
-	-I$(TARGETDIR)/project/$(SDK)/platform/driver/button/inc \
 	-I$(TARGETDIR)/project/$(SDK)/platform/driver/debug/inc \
-	-I$(TARGETDIR)/project/$(SDK)/platform/driver/leddrv/inc \
-	-I$(TARGETDIR)/project/$(SDK)/platform/emdrv/common/inc \
-	-I$(TARGETDIR)/project/$(SDK)/platform/emdrv/dmadrv/inc \
-	-I$(TARGETDIR)/project/$(SDK)/platform/emdrv/dmadrv/inc/s2_signals \
-	-I$(TARGETDIR)/project/$(SDK)/platform/emdrv/gpiointerrupt/inc \
-	-I$(TARGETDIR)/project/$(SDK)/platform/emdrv/uartdrv/inc \
 	-I$(TARGETDIR)/project/$(SDK)/platform/emlib/inc \
 	-I$(TARGETDIR)/project/$(SDK)/platform/peripheral/inc \
 	-I$(TARGETDIR)/project/$(SDK)/platform/service/clock_manager/inc \
@@ -67,19 +60,13 @@ KERNEL_DIR := $(KERNEL_DIR) \
 	$(TARGETDIR)/project/$(SDK)/hardware/driver/configuration_over_swo/src \
 	$(TARGETDIR)/project/$(SDK)/platform/common/src \
 	$(TARGETDIR)/project/$(SDK)/platform/Device/SiliconLabs/$(DEVICE)/Source \
-	$(TARGETDIR)/project/$(SDK)/platform/driver/button/src \
 	$(TARGETDIR)/project/$(SDK)/platform/driver/debug/src \
-	$(TARGETDIR)/project/$(SDK)/platform/driver/leddrv/src \
-	$(TARGETDIR)/project/$(SDK)/platform/emdrv/dmadrv/src \
-	$(TARGETDIR)/project/$(SDK)/platform/emdrv/gpiointerrupt/src \
-	$(TARGETDIR)/project/$(SDK)/platform/emdrv/uartdrv/src \
 	$(TARGETDIR)/project/$(SDK)/platform/emlib/src \
 	$(TARGETDIR)/project/$(SDK)/platform/peripheral/src \
 	$(TARGETDIR)/project/$(SDK)/platform/service/system/src \
 	$(TARGETDIR)/project/$(SDK)/platform/service/clock_manager/src \
 	$(TARGETDIR)/project/$(SDK)/platform/service/device_init/src \
 	$(TARGETDIR)/project/$(SDK)/platform/service/device_manager/clocks \
-	$(TARGETDIR)/project/$(SDK)/platform/service/device_manager/devices \
 	$(TARGETDIR)/project/$(SDK)/platform/service/device_manager/src \
 	$(TARGETDIR)/project/$(SDK)/platform/service/interrupt_manager/src \
 	$(TARGETDIR)/project/$(SDK)/platform/service/sleeptimer/src
@@ -89,11 +76,7 @@ KERNEL_COBJS := $(KERNEL_COBJS) \
 	em_emu.o \
 	em_eusart.o \
 	em_gpio.o \
-	em_ldma.o \
 	em_usart.o \
-	dmadrv.o \
-	gpiointerrupt.o \
-	sl_button.o \
 	sl_board_control_gpio.o \
 	sl_board_default_init.o \
 	sl_board_init.o \
@@ -107,22 +90,10 @@ KERNEL_COBJS := $(KERNEL_COBJS) \
 	sl_device_clock_$(CHIP).o \
 	sl_device_init_dcdc_s2.o \
 	sl_device_init_emu_s2.o \
-	sl_device_peripheral.o \
-	sl_device_peripheral_hal_$(CHIP).o \
 	sl_event_handler.o \
-	sl_hal_sysrtc.o \
 	sl_interrupt_manager_cortexm.o \
-	sl_led.o \
-	sl_simple_button.o \
-	sl_simple_button_instances.o \
-	sl_simple_led.o \
-	sl_simple_led_instances.o \
-	sl_sleeptimer.o \
-	sl_sleeptimer_hal_sysrtc.o \
 	sl_system_init.o \
-	sl_uartdrv_init.o \
 	system_efr32zg23.o \
-	uartdrv.o \
 	target_config.o
 KERNEL_CFLAGS := $(KERNEL_CFLAGS)
 

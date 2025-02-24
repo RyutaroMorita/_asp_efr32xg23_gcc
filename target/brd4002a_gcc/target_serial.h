@@ -50,10 +50,10 @@
 /*
  *  シリアルポートの優先度と割り込み属性
  */
-#define INHNO_SIO_TX  (USART0_TX_IRQn + 16)
-#define INTNO_SIO_TX  (USART0_TX_IRQn + 16)
-#define INHNO_SIO_RX  (USART0_RX_IRQn + 16)
-#define INTNO_SIO_RX  (USART0_RX_IRQn + 16)
+#define INHNO_SIO_TX  (EUSART1_TX_IRQn + 16)
+#define INTNO_SIO_TX  (EUSART1_TX_IRQn + 16)
+#define INHNO_SIO_RX  (EUSART1_RX_IRQn + 16)
+#define INTNO_SIO_RX  (EUSART1_RX_IRQn + 16)
 #define INTPRI_SIO    -4                    /* 割込み優先度 */
 #define INTATR_SIO    (TA_NULL)             /* 割込み属性 */
 

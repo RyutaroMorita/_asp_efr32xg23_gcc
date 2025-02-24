@@ -38,40 +38,36 @@
  */
 
 /*
- * シリアルドライバ（STM32F USART用）
+ * シリアルドライバ（EFR32xG23用）
  */
 
 #include <kernel.h>
 #include <sil.h>
 #include "usart.h"
 #include "target_syssvc.h"
-//#include "stm32f4xx_hal.h"
+#include "em_eusart.h"
+#include "em_gpio.h"
+
 
 /*
- * レジスタ設定値
+ *  シリアルI/Oポート初期化ブロックの定義
  */
-#define PORT2SIOPID(x)	((x) + 1)
-#define INDEX_PORT(x)	((x) - 1)
-#define GET_SIOPCB(x)	(&siopcb_table[INDEX_PORT(x)])
-
-/*
- * USARTレジスタ定義
- */
-#define USART_SR(x)		(x)
-#define USART_DR(x)		(x + 0x04)
-#define USART_BRR(x)	(x + 0x08)
-#define USART_CR1(x)	(x + 0x0C)
-#define USART_CR2(x)	(x + 0x10)
-#define USART_CR3(x)	(x + 0x14)
-#define USART_GTPR(x)	(x + 0x18)
+typedef struct sio_port_initialization_block {
+  EUSART_TypeDef*   p_eusart;
+  int               index;
+  GPIO_Port_TypeDef tx_port;
+  unsigned int      tx_pin;
+  GPIO_Port_TypeDef rx_port;
+  unsigned int      rx_pin;
+} SIOPINIB;
 
 /*
  *  シリアルポートの管理ブロック
  */
 struct sio_port_control_block {
-	ID port;
-	uint32_t reg;
-	intptr_t exinf;
+  const SIOPINIB* p_siopinib;
+  intptr_t        exinf;
+  bool_t          is_initialized; /* デバイス初期化済みフラグ */
 };
 
 /*
@@ -79,83 +75,47 @@ struct sio_port_control_block {
  */
 SIOPCB siopcb_table[TNUM_PORT];
 
-static const uint32_t sioreg_table[TNUM_PORT] = {
-//	USART1_BASE,
-#if (TNUM_PORT >= 2)
-//	USART2_BASE,
-#endif
+static const SIOPINIB siopinib_table[TNUM_PORT] = {
+    {
+        EUSART0,
+        1,
+        gpioPortA,
+        8,
+        gpioPortA,
+        9
+    },
+    {
+        EUSART1,
+        1,
+        gpioPortA,
+        8,
+        gpioPortA,
+        9
+    }
 };
 
-Inline bool_t
-sio_putready(SIOPCB* siopcb)
-{
-	//return (sil_rew_mem((void*)USART_SR(siopcb->reg)) & USART_SR_TXE) != 0;
-  return false;
-}
-
-Inline bool_t
-sio_getready(SIOPCB* siopcb)
-{
-	//return (sil_rew_mem((void*)USART_SR(siopcb->reg)) & USART_SR_RXNE) != 0;
-  return false;
-}
-
 /*
- *  ターゲットのシリアル初期化
+ *  シリアルI/OポートIDから管理ブロックを取り出すためのマクロ
  */
-void
-usart_init(ID siopid)
+#define INDEX_SIOP(siopid)   ((uint_t)((siopid) - 1))
+#define get_siopcb(siopid)   (&(siopcb_table[INDEX_SIOP(siopid)]))
+#define get_siopinib(siopid) (&(siopinib_table[INDEX_SIOP(siopid)]))
+
+
+Inline bool_t
+sio_putready(SIOPCB* p_siopcb)
 {
-#if 0
-	uint32_t tmp, usartdiv, fraction;
-	uint32_t reg = sioreg_table[INDEX_PORT(siopid)];
-	uint32_t src_clock;
-
-	/* USARTの無効化 */
-	sil_andw((void*)USART_CR1(reg), ~USART_CR1_UE);
-
-	/* 1STOP BIT */
-	sil_wrw_mem((void*)USART_CR2(reg), 0);
-
-	/* 1START BIT, 8DATA bits, Parityなし */
-	sil_wrw_mem((void*)USART_CR1(reg), 0);
-
-	/* CR3初期化 */
-	sil_wrw_mem((void*)USART_CR3(reg), 0);
-
-	/* 通信速度設定 */
-	if (siopid == 1) {
-		/* USART1のみPCLK2を使用する */
-		src_clock = HAL_RCC_GetPCLK2Freq();
-	} else {
-		src_clock = HAL_RCC_GetPCLK1Freq();
-	}
-	tmp = (1000 * (src_clock / 100)) / ((BPS_SETTING / 100) * 16);
-	usartdiv = (tmp / 1000) << 4;
-	fraction = tmp - ((usartdiv >> 4) * 1000);
-	fraction = ((16 * fraction) + 500) / 1000;
-	usartdiv |= (fraction & 0x0F);
-	sil_wrw_mem((void*)USART_BRR(reg), usartdiv);
-
-	/* 送受信の有効化、エラー割込みの有効化 */
-	sil_orw((void*)USART_CR1(reg), USART_CR1_RE | USART_CR1_TE);
-	sil_orw((void*)USART_CR3(reg), USART_CR3_EIE);
-
-	/* USARTの有効化 */
-	sil_orw((void*)USART_CR1(reg), USART_CR1_UE);
-#endif
+  uint32_t sts;
+  sts = EUSART_StatusGet(p_siopcb->p_siopinib->p_eusart);
+	return (EUSART_STATUS_TXFL & sts);
 }
 
-/*
- *  ターゲットのシリアル終了
- */
-static void
-usart_term(ID siopid)
+Inline bool_t
+sio_getready(SIOPCB* p_siopcb)
 {
-	uint32_t reg = sioreg_table[INDEX_PORT(siopid)];
-
-	/* USARTの無効化 */
-	//sil_andw((void*)USART_CR1(reg),  ~USART_CR1_UE);
+  uint32_t sts;
+  sts = EUSART_StatusGet(p_siopcb->p_siopinib->p_eusart);
+  return (EUSART_STATUS_RXFL & sts);
 }
 
 /*
@@ -167,39 +127,81 @@ sio_initialize(intptr_t exinf)
 	int i;
 
 	for (i = 0; i < TNUM_PORT; i++) {
-		siopcb_table[i].port = i;
-		siopcb_table[i].reg = sioreg_table[i];
+		siopcb_table[i].p_siopinib = &(siopinib_table[i]);
 		siopcb_table[i].exinf = 0;
+    siopcb_table[i].is_initialized = false;
 	}
+}
+
+/*
+ *  カーネル起動時のバナー出力用の初期化
+ */
+void
+sio_uart_init(ID siopid, uint32_t bitrate)
+{
+  SIOPCB*         p_siopcb = get_siopcb(siopid);
+  const SIOPINIB* p_siopinib = get_siopinib(siopid);
+  /*  この時点では、p_siopcb->p_siopinibは初期化されていない  */
+
+  /*  二重初期化の防止  */
+  p_siopcb->is_initialized = true;
+
+  // Configure the EUSART TX pin to the board controller as an output
+  GPIO_PinModeSet(p_siopinib->tx_port, p_siopinib->tx_pin, gpioModePushPull, 1);
+
+  // Configure the EUSART RX pin to the board controller as an input
+  GPIO_PinModeSet(p_siopinib->rx_port, p_siopinib->rx_pin, gpioModeInput, 0);
+
+  // Default asynchronous initializer (115.2 Kbps, 8N1, no flow control)
+  EUSART_UartInit_TypeDef init = EUSART_UART_INIT_DEFAULT_HF;
+  init.baudrate = bitrate;
+
+  // Route EUSART1 TX and RX to the board controller TX and RX pins
+  GPIO->EUSARTROUTE[p_siopinib->index].TXROUTE = (p_siopinib->tx_port << _GPIO_EUSART_TXROUTE_PORT_SHIFT)
+      | (p_siopinib->tx_pin << _GPIO_EUSART_TXROUTE_PIN_SHIFT);
+  GPIO->EUSARTROUTE[p_siopinib->index].RXROUTE = (p_siopinib->rx_port << _GPIO_EUSART_RXROUTE_PORT_SHIFT)
+      | (p_siopinib->rx_pin << _GPIO_EUSART_RXROUTE_PIN_SHIFT);
+
+  // Enable RX and TX signals now that they have been routed
+  GPIO->EUSARTROUTE[p_siopinib->index].ROUTEEN = GPIO_EUSART_ROUTEEN_RXPEN | GPIO_EUSART_ROUTEEN_TXPEN;
+
+  // Configure and enable EUSART1 for high-frequency (EM0/1) operation
+  EUSART_UartInitHf(p_siopinib->p_eusart, &init);
 }
 
 /*
  *  シリアルオープン
  */
-SIOPCB
-*sio_opn_por(ID siopid, intptr_t exinf)
+SIOPCB*
+sio_opn_por(ID siopid, intptr_t exinf)
 {
-	SIOPCB* siopcb;
+  SIOPCB*         p_siopcb = get_siopcb(siopid);
 
 	if (siopid > TNUM_PORT) {
 		return NULL;
 	}
 
-	siopcb = GET_SIOPCB(siopid);
-	siopcb->exinf = exinf;
+	p_siopcb->exinf = exinf;
 
-	usart_init(siopid);
+  /*
+   *  ハードウェアの初期化
+   *
+   *  既に初期化している場合は, 二重に初期化しない.
+   */
+  if(!(p_siopcb->is_initialized)){
+      sio_uart_init(siopid, BPS_SETTING);
+  }
 
-	return siopcb;
+	return (p_siopcb);
 }
 
 /*
  *  シリアルクローズ
  */
 void
-sio_cls_por(SIOPCB *p_siopcb)
+sio_cls_por(SIOPCB* p_siopcb)
 {
-	usart_term(PORT2SIOPID(p_siopcb->port));
+	(void)p_siopcb;
 }
 
 /*
@@ -208,26 +210,24 @@ sio_cls_por(SIOPCB *p_siopcb)
 void
 sio_tx_isr(intptr_t exinf)
 {
-	SIOPCB* siopcb = GET_SIOPCB(exinf);
-
-	if (sio_putready(siopcb)) {
-		sio_irdy_snd(siopcb->exinf);
+  SIOPCB*         p_siopcb = get_siopcb((int)exinf);
+	if (sio_putready(p_siopcb)) {
+		sio_irdy_snd(p_siopcb->exinf);
 	}
-	if (sio_getready(siopcb)) {
-		sio_irdy_rcv(siopcb->exinf);
+	if (sio_getready(p_siopcb)) {
+		sio_irdy_rcv(p_siopcb->exinf);
 	}
 }
 
 void
 sio_rx_isr(intptr_t exinf)
 {
-  SIOPCB* siopcb = GET_SIOPCB(exinf);
-
-  if (sio_putready(siopcb)) {
-    sio_irdy_snd(siopcb->exinf);
+  SIOPCB*         p_siopcb = get_siopcb((int)exinf);
+  if (sio_putready(p_siopcb)) {
+    sio_irdy_snd(p_siopcb->exinf);
   }
-  if (sio_getready(siopcb)) {
-    sio_irdy_rcv(siopcb->exinf);
+  if (sio_getready(p_siopcb)) {
+    sio_irdy_rcv(p_siopcb->exinf);
   }
 }
 
@@ -235,11 +235,10 @@ sio_rx_isr(intptr_t exinf)
  *  1文字送信
  */
 bool_t
-sio_snd_chr(SIOPCB *siopcb, char c)
+sio_snd_chr(SIOPCB* p_siopcb, char c)
 {
-	if (sio_putready(siopcb)) {
-		sil_wrw_mem((void*)USART_DR(siopcb->reg), c);
-
+	if (sio_putready(p_siopcb)) {
+		EUSART_Tx(p_siopcb->p_siopinib->p_eusart, (uint8_t)c);
 		return true;
 	}
 
@@ -250,14 +249,12 @@ sio_snd_chr(SIOPCB *siopcb, char c)
  *  1文字受信
  */
 int_t
-sio_rcv_chr(SIOPCB *siopcb)
+sio_rcv_chr(SIOPCB *p_siopcb)
 {
 	int_t c = -1;
-
-	if (sio_getready(siopcb)) {
-		c = sil_rew_mem((void*)USART_DR(siopcb->reg)) & 0xFF;
+	if (sio_getready(p_siopcb)) {
+		c = (int_t)EUSART_Rx(p_siopcb->p_siopinib->p_eusart);
 	}
-
 	return c;
 }
 
@@ -269,10 +266,10 @@ sio_ena_cbr(SIOPCB *siopcb, uint_t cbrtn)
 {
 	switch (cbrtn) {
 	case SIO_RDY_SND:
-		//sil_orw((void*)USART_CR1(siopcb->reg), USART_CR1_TXEIE);
+	  EUSART_IntEnable(EUSART1, EUSART_IEN_TXFL);
 		break;
 	case SIO_RDY_RCV:
-		//sil_orw((void*)USART_CR1(siopcb->reg), USART_CR1_RXNEIE);
+	  EUSART_IntEnable(EUSART1, EUSART_IEN_RXFL);
 		break;
 	default:
 		break;
@@ -287,10 +284,10 @@ sio_dis_cbr(SIOPCB *siopcb, uint_t cbrtn)
 {
 	switch (cbrtn) {
 	case SIO_RDY_SND:
-		//sil_andw((void*)USART_CR1(siopcb->reg), ~USART_CR1_TXEIE);
+	  EUSART_IntDisable(EUSART1, EUSART_IEN_TXFL);
 		break;
 	case SIO_RDY_RCV:
-		//sil_andw((void*)USART_CR1(siopcb->reg), ~USART_CR1_RXNEIE);
+	  EUSART_IntDisable(EUSART1, EUSART_IEN_RXFL);
 		break;
 	default:
 		break;
@@ -303,9 +300,10 @@ sio_dis_cbr(SIOPCB *siopcb, uint_t cbrtn)
 void
 sio_pol_snd_chr(char c, ID siopid)
 {
-	uint32_t reg = sioreg_table[INDEX_PORT(siopid)];
-
-	sil_wrw_mem((void*)USART_DR(reg), c);
-
-	//while ((sil_rew_mem((void*)USART_SR(reg)) & USART_SR_TXE) == 0) ;
+  const SIOPINIB* p_siopinib = get_siopinib(siopid);
+	char cr = '\r';
+  if (c == '\n') {
+      EUSART_Tx(p_siopinib->p_eusart, (uint8_t)cr);
+  }
+  EUSART_Tx(p_siopinib->p_eusart, (uint8_t)c);
 }

@@ -49,7 +49,7 @@
  * ゲット依存部の位置付けとなす．
  */
 #ifndef TOPPERS_MACRO_ONLY
-//#include "stm32f4xx_nucleo.h"
+#include "em_device.h"
 #endif /* TOPPERS_MACRO_ONLY */
 
 /*
@@ -60,7 +60,7 @@
 /*
  *  割込み数
  */
-#define TMAX_INTNO (84 + 16)
+#define TMAX_INTNO (EXT_IRQ_COUNT + 16)
 
 /*
  *  デフォルトの非タスクコンテキスト用のスタック領域の定義
@@ -81,7 +81,7 @@
 /*
  *  クロック
  */
-#define SYS_CLOCK		84000000
+#define SYS_CLOCK		39000000
 
 /*
  * IDLE処理の定義

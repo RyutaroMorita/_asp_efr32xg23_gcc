@@ -44,9 +44,20 @@
  */
 #include "kernel_impl.h"
 #include <sil.h>
+#include "target_syssvc.h"
+#include "target_serial.h"
 #include "sl_system_init.h"
-//#include "stm32f4xx_hal.h"
-//#include "stm32f4xx_nucleo.h"
+#include "em_cmu.h"
+#include "em_gpio.h"
+#include "em_eusart.h"
+#include "sl_board_control_config.h"
+
+/*
+#define BSP_BCC_TXPORT  gpioPortA
+#define BSP_BCC_TXPIN   8
+#define BSP_BCC_RXPORT  gpioPortA
+#define BSP_BCC_RXPIN   9
+*/
 
 /*
  *  起動直後の初期化(system_stm32f4xx.c)
@@ -67,11 +78,6 @@ static void usart_early_init(void);
  *  エラー時の処理
  */
 extern void Error_Handler(void);
-
-int main(void)
-{
-  sta_ker();
-}
 
 /*
  *  起動時のハードウェア初期化処理
@@ -110,11 +116,28 @@ target_initialize(void)
 	/*
 	 *  使用するペリフェラルにクロックを供給
 	 */
+  CMU_ClockEnable(cmuClock_GPIO, true);
+  CMU_ClockEnable(cmuClock_EUSART1, true);
 
-	/*
-	 *  UserLEDの初期化
-	 */
-	//BSP_LED_Init(LED2);
+  /*
+   *  使用する GPIO の設定
+   */
+  // Configure the EUSART TX pin to the board controller as an output
+  //GPIO_PinModeSet(BSP_BCC_TXPORT, BSP_BCC_TXPIN, gpioModePushPull, 1);
+
+  // Configure the EUSART RX pin to the board controller as an input
+  //GPIO_PinModeSet(BSP_BCC_RXPORT, BSP_BCC_RXPIN, gpioModeInput, 0);
+
+  /*
+   * Configure the BCC_ENABLE pin as output and set high.  This enables
+   * the virtual COM port (VCOM) connection to the board controller and
+   * permits serial port traffic over the debug connection to the host
+   * PC.
+   *
+   * To disable the VCOM connection and use the pins on the kit
+   * expansion (EXP) header, comment out the following line.
+   */
+  GPIO_PinModeSet(SL_BOARD_ENABLE_VCOM_PORT, SL_BOARD_ENABLE_VCOM_PIN, gpioModePushPull, 1);
 
 	/*
 	 *  バーナー出力用のシリアル初期化
@@ -138,43 +161,25 @@ target_exit(void)
 void
 usart_early_init()
 {
-#if 0
-	GPIO_InitTypeDef  GPIO_InitStruct;
+  /*
+  // Default asynchronous initializer (115.2 Kbps, 8N1, no flow control)
+  EUSART_UartInit_TypeDef init = EUSART_UART_INIT_DEFAULT_HF;
+  init.baudrate = 9600;
 
-	/* Enable Clock */
-	__HAL_RCC_GPIOA_CLK_ENABLE();
-	__HAL_RCC_USART2_CLK_ENABLE();
-  
-	/* UART TX GPIO pin configuration  */
-	GPIO_InitStruct.Pin       = GPIO_PIN_2;
-	GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
-	GPIO_InitStruct.Pull      = GPIO_PULLUP;
-	GPIO_InitStruct.Speed     = GPIO_SPEED_FAST;
-	GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
+  // Route EUSART1 TX and RX to the board controller TX and RX pins
+  GPIO->EUSARTROUTE[1].TXROUTE = (BSP_BCC_TXPORT << _GPIO_EUSART_TXROUTE_PORT_SHIFT)
+      | (BSP_BCC_TXPIN << _GPIO_EUSART_TXROUTE_PIN_SHIFT);
+  GPIO->EUSARTROUTE[1].RXROUTE = (BSP_BCC_RXPORT << _GPIO_EUSART_RXROUTE_PORT_SHIFT)
+      | (BSP_BCC_RXPIN << _GPIO_EUSART_RXROUTE_PIN_SHIFT);
 
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-    
-	/* UART RX GPIO pin configuration  */
-	GPIO_InitStruct.Pin = GPIO_PIN_3;
-	GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
-    
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  // Enable RX and TX signals now that they have been routed
+  GPIO->EUSARTROUTE[1].ROUTEEN = GPIO_EUSART_ROUTEEN_RXPEN | GPIO_EUSART_ROUTEEN_TXPEN;
 
-	UartHandle.Instance          = USART2;
-  
-	UartHandle.Init.BaudRate     = 115200;
-	UartHandle.Init.WordLength   = UART_WORDLENGTH_8B;
-	UartHandle.Init.StopBits     = UART_STOPBITS_1;
-	UartHandle.Init.Parity       = UART_PARITY_NONE;
-	UartHandle.Init.HwFlowCtl    = UART_HWCONTROL_NONE;
-	UartHandle.Init.Mode         = UART_MODE_TX_RX;
-	UartHandle.Init.OverSampling = UART_OVERSAMPLING_16;
-    
-	if(HAL_UART_Init(&UartHandle) != HAL_OK) {
-		Error_Handler();
-	}
-#endif
-};
+  // Configure and enable EUSART1 for high-frequency (EM0/1) operation
+  EUSART_UartInitHf(EUSART1, &init);
+  */
+  sio_uart_init(LOGTASK_PORTID, BPS_SETTING);
+}
 
 /*
  * システムログの低レベル出力のための文字出力
@@ -182,12 +187,13 @@ usart_early_init()
 void
 target_fput_log(char c)
 {
+  sio_pol_snd_chr(c, LOGTASK_PORTID);
 #if 0
 	char cr = '\r';
 	if (c == '\n') {
-		HAL_UART_Transmit(&UartHandle, (uint8_t *)&cr, 1, 0xFFFF); 
+	    EUSART_Tx(EUSART1, (uint8_t)cr);
 	}
-	HAL_UART_Transmit(&UartHandle, (uint8_t *)&c, 1, 0xFFFF); 
+	EUSART_Tx(EUSART1, (uint8_t)c);
 #endif
 }
 
@@ -205,20 +211,3 @@ Error_Handler(void){
 	}
 #endif
 }
-
-#include "time_event.h"
-
-/*
- *  HAL実行用の関数
- */
-#if 0
-HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
-{
-  return HAL_OK;
-}
-
-uint32_t HAL_GetTick(void)
-{
-  return current_time;
-}
-#endif
