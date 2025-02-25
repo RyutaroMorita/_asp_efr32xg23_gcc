@@ -79,5 +79,9 @@
 			</target>
 		</buildTargets>
 	</storageModule>
-	<storageModule moduleId="refreshScope"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Default">
+			<resource resourceType="PROJECT" workspacePath="/asp_efr32xg23_gcc"/>
+		</configuration>
+	</storageModule>
 </cproject>

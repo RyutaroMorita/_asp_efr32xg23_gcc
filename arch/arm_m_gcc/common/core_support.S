@@ -80,8 +80,10 @@ ALABEL(dispatch_1)
 	ldr   r0, =p_runtsk           /* p_runtskを読み込む */
 	ldr   r1, [r0]
 	str   sp, [r1,#TCB_sp]        /* タスクスタックを保存 */
-	ldr   lr, =dispatch_r         /* 実行再開番地を保存 */
-	str   lr, [r1,#TCB_pc]        
+	//ldr   lr, =dispatch_r       /* 実行再開番地を保存 */
+	//str   lr, [r1,#TCB_pc]	  /* lrにロードするとデバッガがコンフリクトするため以下に改訂 */
+	ldr   r0, =dispatch_r		  /* 実行再開番地を保存 */
+	str   r0, [r1,#TCB_pc]
 	b     dispatcher
 
 	ATHUMB(dispatch_r)
@@ -499,8 +501,10 @@ ALABEL(ret_int_5)
 #endif /* TOPPERS_FPU_CONTEXT */ 
 	stmfd sp!, {r4-r11}       /* 残りのレジスタを保存 -(8*4) */
 	str   sp, [r1,#TCB_sp]    /* タスクスタックを保存 */
-	ldr   lr, =ret_int_r      /* 実行再開番地を保存   */
-	str   lr, [r1,#TCB_pc]
+	//ldr   lr, =ret_int_r    /* 実行再開番地を保存   */
+	//str   lr, [r1,#TCB_pc]  /* lrにロードするとデバッガがコンフリクトするため以下に改訂 */
+	ldr   r0, =ret_int_r      /* 実行再開番地を保存   */
+	str   r0, [r1,#TCB_pc]
 	b     dispatcher          /* ディスパッチャへ */
 
 /*
@@ -720,10 +724,10 @@ ALABEL(dispatcher_2)
 	toppers_asm_custom_idle
 #else
 	cpsid i               /* PRIMASK をセット */
-	msr   basepri, r4     /* 全割込み許可 */ 
+	msr   basepri, r4     /* 全割込み許可 */
 	wfi
 	cpsie i               /* PRIMASK をクリア（割込みを受け付ける） */
-	msr   basepri, r5     /* CPUロック状態へ */ 
+	msr   basepri, r5     /* CPUロック状態へ */
 #endif /* TOPPERS_CUSTOM_IDLE */
 
 	ldr   r0, [r6]        /* reqflgがfalseならdispatcher_2へ */

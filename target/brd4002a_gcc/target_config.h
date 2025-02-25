@@ -93,8 +93,8 @@
 #define TOPPERS_CUSTOM_IDLE
 #define toppers_asm_custom_idle		\
 	msr		basepri, r4;			\
+	nop;                    \
 	msr		basepri, r5;
-
 
 #ifndef TOPPERS_MACRO_ONLY
 

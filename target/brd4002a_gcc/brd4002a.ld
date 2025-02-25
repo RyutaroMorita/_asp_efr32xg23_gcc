@@ -33,6 +33,8 @@ SECTIONS
 	.ARM.exidx   : { *(.ARM.exidx* .gnu.linkonce.armexidx.*) }
 	__exidx_end = .;
 
+	. = ALIGN(4);
+
 	__idata_start = .;
 	.data : AT (__idata_start)
 	{

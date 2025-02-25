@@ -47,7 +47,8 @@ CFG1_OUT_LDFLAGS := -nostdlib $(CFG1_OUT_LDFLAGS)
 #
 # ファイルサイズ削減のためのオプション
 #
-COPTS   := $(COPTS) -ffunction-sections -fdata-sections
+#COPTS   := $(COPTS) -ffunction-sections -fdata-sections
+COPTS   := $(COPTS) -ffunction-sections
 LDFLAGS := $(LDFLAGS) -Wl,--gc-sections
 
 #

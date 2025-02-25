@@ -296,7 +296,7 @@ void main_task(intptr_t exinf)
 	SYSUTM	utime1, utime2;
 #endif /* TOPPERS_SUPPORT_GET_UTM */
 
-	SVC_PERROR(syslog_msk_log(LOG_UPTO(LOG_INFO), LOG_UPTO(LOG_EMERG)));
+  SVC_PERROR(syslog_msk_log(LOG_UPTO(LOG_INFO), LOG_UPTO(LOG_EMERG)));
 	syslog(LOG_NOTICE, "Sample program starts (exinf = %d).", (int_t) exinf);
 
 	/*
@@ -371,6 +371,8 @@ void main_task(intptr_t exinf)
 	SVC_PERROR(act_tsk(TASK1));
 	SVC_PERROR(act_tsk(TASK2));
 	SVC_PERROR(act_tsk(TASK3));
+
+	//EMU_EnterEM2(true);
 
 	/*
  	 *  ÉÅÉCÉìÉãÅ[Év

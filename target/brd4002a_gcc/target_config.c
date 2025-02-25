@@ -53,48 +53,25 @@
 #include "sl_board_control_config.h"
 
 /*
-#define BSP_BCC_TXPORT  gpioPortA
-#define BSP_BCC_TXPIN   8
-#define BSP_BCC_RXPORT  gpioPortA
-#define BSP_BCC_RXPIN   9
-*/
-
-/*
- *  起動直後の初期化(system_stm32f4xx.c)
- */
-extern void SystemInit(void);
-
-/*
- *  クロックの初期化(systemclock_config.c)
- */
-extern void SystemClock_Config(void);
-
-/*
  *  バーナ出力用のUARTの初期化
  */
 static void usart_early_init(void);
 
 /*
- *  エラー時の処理
- */
-extern void Error_Handler(void);
-
-/*
  *  起動時のハードウェア初期化処理
  */
+#if 0
 uint32_t g_istk;
 void
 hardware_init_hook(void) {
-	//SystemInit();
-
 	/*
 	 *  -fdata-sectionsを使用するとistkが削除され，
 	 *  cfgのパス3のチェックがエラーとなるため，
 	 *  削除されないようにする 
 	 */
-	//SystemCoreClock = (uint32_t)istk;
   g_istk = (uint32_t)istk;
 }
+#endif
 
 /*
  * ターゲット依存部 初期化処理
@@ -122,12 +99,6 @@ target_initialize(void)
   /*
    *  使用する GPIO の設定
    */
-  // Configure the EUSART TX pin to the board controller as an output
-  //GPIO_PinModeSet(BSP_BCC_TXPORT, BSP_BCC_TXPIN, gpioModePushPull, 1);
-
-  // Configure the EUSART RX pin to the board controller as an input
-  //GPIO_PinModeSet(BSP_BCC_RXPORT, BSP_BCC_RXPIN, gpioModeInput, 0);
-
   /*
    * Configure the BCC_ENABLE pin as output and set high.  This enables
    * the virtual COM port (VCOM) connection to the board controller and
@@ -137,7 +108,12 @@ target_initialize(void)
    * To disable the VCOM connection and use the pins on the kit
    * expansion (EXP) header, comment out the following line.
    */
-  GPIO_PinModeSet(SL_BOARD_ENABLE_VCOM_PORT, SL_BOARD_ENABLE_VCOM_PIN, gpioModePushPull, 1);
+  GPIO_PinModeSet(
+      SL_BOARD_ENABLE_VCOM_PORT,
+      SL_BOARD_ENABLE_VCOM_PIN,
+      gpioModePushPull,
+      1
+  );
 
 	/*
 	 *  バーナー出力用のシリアル初期化
@@ -161,23 +137,6 @@ target_exit(void)
 void
 usart_early_init()
 {
-  /*
-  // Default asynchronous initializer (115.2 Kbps, 8N1, no flow control)
-  EUSART_UartInit_TypeDef init = EUSART_UART_INIT_DEFAULT_HF;
-  init.baudrate = 9600;
-
-  // Route EUSART1 TX and RX to the board controller TX and RX pins
-  GPIO->EUSARTROUTE[1].TXROUTE = (BSP_BCC_TXPORT << _GPIO_EUSART_TXROUTE_PORT_SHIFT)
-      | (BSP_BCC_TXPIN << _GPIO_EUSART_TXROUTE_PIN_SHIFT);
-  GPIO->EUSARTROUTE[1].RXROUTE = (BSP_BCC_RXPORT << _GPIO_EUSART_RXROUTE_PORT_SHIFT)
-      | (BSP_BCC_RXPIN << _GPIO_EUSART_RXROUTE_PIN_SHIFT);
-
-  // Enable RX and TX signals now that they have been routed
-  GPIO->EUSARTROUTE[1].ROUTEEN = GPIO_EUSART_ROUTEEN_RXPEN | GPIO_EUSART_ROUTEEN_TXPEN;
-
-  // Configure and enable EUSART1 for high-frequency (EM0/1) operation
-  EUSART_UartInitHf(EUSART1, &init);
-  */
   sio_uart_init(LOGTASK_PORTID, BPS_SETTING);
 }
 
@@ -188,26 +147,4 @@ void
 target_fput_log(char c)
 {
   sio_pol_snd_chr(c, LOGTASK_PORTID);
-#if 0
-	char cr = '\r';
-	if (c == '\n') {
-	    EUSART_Tx(EUSART1, (uint8_t)cr);
-	}
-	EUSART_Tx(EUSART1, (uint8_t)c);
-#endif
-}
-
-/*
- * 初期化時のエラー発生時の処理
- */
-void
-Error_Handler(void){
-#if 0
-	volatile int loop;
-	BSP_LED_Init(LED2);
-	while(1){
-		for(loop = 0; loop < 0x100000; loop++);
-		BSP_LED_Toggle(LED2);
-	}
-#endif
 }

@@ -45,6 +45,7 @@
 #include <sil.h>
 #include "usart.h"
 #include "target_syssvc.h"
+#include "target_serial.h"
 #include "em_eusart.h"
 #include "em_gpio.h"
 
@@ -129,7 +130,7 @@ sio_initialize(intptr_t exinf)
 	for (i = 0; i < TNUM_PORT; i++) {
 		siopcb_table[i].p_siopinib = &(siopinib_table[i]);
 		siopcb_table[i].exinf = 0;
-    siopcb_table[i].is_initialized = false;
+    //siopcb_table[i].is_initialized = false;
 	}
 }
 
@@ -192,6 +193,9 @@ sio_opn_por(ID siopid, intptr_t exinf)
       sio_uart_init(siopid, BPS_SETTING);
   }
 
+  ena_int(INTNO_SIO_TX);
+  ena_int(INTNO_SIO_RX);
+
 	return (p_siopcb);
 }
 
@@ -214,21 +218,17 @@ sio_tx_isr(intptr_t exinf)
 	if (sio_putready(p_siopcb)) {
 		sio_irdy_snd(p_siopcb->exinf);
 	}
-	if (sio_getready(p_siopcb)) {
-		sio_irdy_rcv(p_siopcb->exinf);
-	}
+	EUSART_IntClear(p_siopcb->p_siopinib->p_eusart, EUSART_IF_TXFL);
 }
 
 void
 sio_rx_isr(intptr_t exinf)
 {
   SIOPCB*         p_siopcb = get_siopcb((int)exinf);
-  if (sio_putready(p_siopcb)) {
-    sio_irdy_snd(p_siopcb->exinf);
-  }
   if (sio_getready(p_siopcb)) {
     sio_irdy_rcv(p_siopcb->exinf);
   }
+  EUSART_IntClear(p_siopcb->p_siopinib->p_eusart, EUSART_IF_RXFL);
 }
 
 /*
@@ -241,7 +241,6 @@ sio_snd_chr(SIOPCB* p_siopcb, char c)
 		EUSART_Tx(p_siopcb->p_siopinib->p_eusart, (uint8_t)c);
 		return true;
 	}
-
 	return false;
 }
 

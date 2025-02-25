@@ -84,7 +84,7 @@ Inline void
 TOPPERS_enaint(bool_t locked)
 {
 	if (!locked) {
-#if __TARGET_ARCH_THUMB == 4
+#if ((__TARGET_ARCH_THUMB == 4) || (__TARGET_ARCH_THUMB == 5))
 		Asm("msr BASEPRI, %0" : : "r"(pre_basepri) : "memory");
 #else /* __TARGET_ARCH_THUMB == 3 */
 		Asm("cpsie i":::"memory");
