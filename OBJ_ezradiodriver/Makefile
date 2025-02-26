@@ -48,7 +48,7 @@ all:
 #
 #  ターゲット略称の定義
 #
-TARGET = brd4002a+efr32zg23_gcc
+TARGET = ezradiodriver_gcc
 
 #
 #  プログラミング言語の定義
