@@ -59,6 +59,13 @@
  *  起動メッセージにターゲット依存部の著作権表示を
  *  追加するためのマクロ．
  */
+#define PRC_COPYRIGHT                   \
+  "Copyright (C) 2025 by Aeterlink Corp., JAPAN\n"
+
+/*
+ *  起動メッセージにターゲット依存部の著作権表示を
+ *  追加するためのマクロ．
+ */
 #ifdef PRC_COPYRIGHT
 #define TARGET_COPYRIGHT	PRC_COPYRIGHT
 #endif /* PRC_COPYRIGHT */
