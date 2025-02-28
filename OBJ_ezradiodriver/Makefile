@@ -153,12 +153,25 @@ CFLAGS = $(COPTS) $(CDEFS) $(INCLUDES)
 #
 #  アプリケーションプログラムに関する定義
 #
-APPLNAME = sample1
+APPLNAME = main
 APPLDIR = 
 APPL_CFG = $(APPLNAME).cfg
 APPL_SRCS = 	$(APPLNAME).o
 
-APPL_DIR = $(APPLDIR) $(SRCDIR)/library
+APPL_DIR = \
+	$(APPLDIR) \
+	$(SRCDIR)/library \
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/driver/button/src \
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/driver/leddrv/src \
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/dmadrv/src \
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/ezradiodrv/common/src \
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/ezradiodrv/common/src/si4x6x \
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/ezradiodrv/plugins/src \
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/gpiointerrupt/src \
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/spidrv/src \
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/ustimer/src \
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/service/device_manager/devices
+	
 APPL_ASMOBJS =
 ifdef USE_CXX
   #APPL_CXXOBJS = $(APPLNAME).o 
@@ -168,12 +181,50 @@ else
   #APPL_COBJS = $(APPLNAME).o
   APPL_COBJS = $(APPL_SRCS)
 endif
-APPL_COBJS := $(APPL_COBJS) log_output.o vasyslog.o t_perror.o strerror.o
+APPL_COBJS := $(APPL_COBJS) log_output.o vasyslog.o t_perror.o strerror.o syscalls.o \
+	dmadrv.o \
+	em_ldma.o \
+	em_timer.o \
+	ezradio_api_lib.o \
+	ezradio_api_lib_add.o \
+	ezradio_comm.o \
+	ezradio_hal.o \
+	t_ezradio_plugin_manager.o \
+	gpiointerrupt.o \
+	sl_button.o \
+	sl_device_peripheral.o \
+	sl_device_peripheral_hal_$(PRC).o \
+	sl_hal_sysrtc.o \
+	sl_led.o \
+	sl_simple_button.o \
+	sl_simple_button_instances.o \
+	sl_simple_led.o \
+	sl_simple_led_instances.o \
+	sl_sleeptimer.o \
+	sl_sleeptimer_hal_sysrtc.o \
+	sl_spidrv_init.o \
+	spidrv.o \
+	ustimer.o
+
 APPL_CFLAGS =
 APPL_LIBS =
 ifdef APPLDIR
   INCLUDES := $(INCLUDES) $(foreach dir,$(APPLDIR),-I$(dir))
 endif
+INCLUDES := \
+	$(INCLUDES) \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/driver/button/inc \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/driver/leddrv/inc \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/common/inc \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/dmadrv/inc \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/dmadrv/inc/s2_signals \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/ezradiodrv/common/inc \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/ezradiodrv/common/inc/si4x6x \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/ezradiodrv/plugins/inc \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/ezradiodrv/si4463/inc \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/gpiointerrupt/inc \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/spidrv/inc \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/ustimer/inc
 
 #
 #  システムサービスに関する定義

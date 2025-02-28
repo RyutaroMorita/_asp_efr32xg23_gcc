@@ -6,10 +6,10 @@
 #  ボード名, チップ名，コア名，開発環境名の定義
 #
 BOARD = ezradiodriver
-CHIP  = efr32xg23
-DEVICE = EFR32ZG23
-MODEL = $(DEVICE)B020F512IM48
 PRC   = efr32xg23
+DEVICE = EFR32ZG23
+PROJECT = Si4x63_PCLE20_FG23_EZRadioDriver
+MODEL = $(DEVICE)B020F512IM48
 TOOL  = gcc
 SDK   = simplicity_sdk_2024.6.2
 
@@ -23,22 +23,22 @@ FPU_USAGE = FPU_LAZYSTACKING
 #
 INCLUDES := $(INCLUDES) \
 	-I$(TARGETDIR) \
-	-I$(TARGETDIR)/project/autogen \
-	-I$(TARGETDIR)/project/config \
-	-I$(TARGETDIR)/project/$(SDK)/hardware/board/inc \
-	-I$(TARGETDIR)/project/$(SDK)/hardware/driver/configuration_over_swo/inc \
-	-I$(TARGETDIR)/project/$(SDK)/platform/CMSIS/Core/Include \
-	-I$(TARGETDIR)/project/$(SDK)/platform/common/inc \
-	-I$(TARGETDIR)/project/$(SDK)/platform/Device/SiliconLabs/$(DEVICE)/Include \
-	-I$(TARGETDIR)/project/$(SDK)/platform/driver/debug/inc \
-	-I$(TARGETDIR)/project/$(SDK)/platform/emlib/inc \
-	-I$(TARGETDIR)/project/$(SDK)/platform/peripheral/inc \
-	-I$(TARGETDIR)/project/$(SDK)/platform/service/clock_manager/inc \
-	-I$(TARGETDIR)/project/$(SDK)/platform/service/device_init/inc \
-	-I$(TARGETDIR)/project/$(SDK)/platform/service/device_manager/inc \
-	-I$(TARGETDIR)/project/$(SDK)/platform/service/interrupt_manager/inc \
-	-I$(TARGETDIR)/project/$(SDK)/platform/service/sleeptimer/inc \
-	-I$(TARGETDIR)/project/$(SDK)/platform/service/system/inc
+	-I$(TARGETDIR)/$(PROJECT)/autogen \
+	-I$(TARGETDIR)/$(PROJECT)/config \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/hardware/board/inc \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/hardware/driver/configuration_over_swo/inc \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/CMSIS/Core/Include \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/common/inc \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/Device/SiliconLabs/$(DEVICE)/Include \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/driver/debug/inc \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emlib/inc \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/peripheral/inc \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/service/clock_manager/inc \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/service/device_init/inc \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/service/device_manager/inc \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/service/interrupt_manager/inc \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/service/sleeptimer/inc \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/service/system/inc
 CDEFS := $(CDEFS) -D$(MODEL)=1
 COPTS := $(COPTS)
 LDFLAGS := -nostdlib $(LDFLAGS)
@@ -56,21 +56,21 @@ LDFLAGS := $(LDFLAGS) -Wl,--gc-sections
 #
 KERNEL_DIR := $(KERNEL_DIR) \
 	$(TARGETDIR) \
-	$(TARGETDIR)/project/autogen \
-	$(TARGETDIR)/project/$(SDK)/hardware/board/src \
-	$(TARGETDIR)/project/$(SDK)/hardware/driver/configuration_over_swo/src \
-	$(TARGETDIR)/project/$(SDK)/platform/common/src \
-	$(TARGETDIR)/project/$(SDK)/platform/Device/SiliconLabs/$(DEVICE)/Source \
-	$(TARGETDIR)/project/$(SDK)/platform/driver/debug/src \
-	$(TARGETDIR)/project/$(SDK)/platform/emlib/src \
-	$(TARGETDIR)/project/$(SDK)/platform/peripheral/src \
-	$(TARGETDIR)/project/$(SDK)/platform/service/system/src \
-	$(TARGETDIR)/project/$(SDK)/platform/service/clock_manager/src \
-	$(TARGETDIR)/project/$(SDK)/platform/service/device_init/src \
-	$(TARGETDIR)/project/$(SDK)/platform/service/device_manager/clocks \
-	$(TARGETDIR)/project/$(SDK)/platform/service/device_manager/src \
-	$(TARGETDIR)/project/$(SDK)/platform/service/interrupt_manager/src \
-	$(TARGETDIR)/project/$(SDK)/platform/service/sleeptimer/src
+	$(TARGETDIR)/$(PROJECT)/autogen \
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/hardware/board/src \
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/hardware/driver/configuration_over_swo/src \
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/common/src \
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/Device/SiliconLabs/$(DEVICE)/Source \
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/driver/debug/src \
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emlib/src \
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/peripheral/src \
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/service/system/src \
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/service/clock_manager/src \
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/service/device_init/src \
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/service/device_manager/clocks \
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/service/device_manager/src \
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/service/interrupt_manager/src \
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/service/sleeptimer/src
 KERNEL_ASMOBJS := $(KERNEL_ASMOBJS) start.o
 KERNEL_COBJS := $(KERNEL_COBJS) \
 	em_cmu.o \
@@ -88,7 +88,7 @@ KERNEL_COBJS := $(KERNEL_COBJS) \
 	sl_core_cortexm.o \
 	sl_cos.o \
 	sl_debug_swo.o \
-	sl_device_clock_$(CHIP).o \
+	sl_device_clock_$(PRC).o \
 	sl_device_init_dcdc_s2.o \
 	sl_device_init_emu_s2.o \
 	sl_event_handler.o \

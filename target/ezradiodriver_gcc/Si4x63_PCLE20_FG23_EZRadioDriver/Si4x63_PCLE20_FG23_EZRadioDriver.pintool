@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="ASCII"?>
+<device:XMLDevice xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:device="http://www.silabs.com/ss/hwconfig/document/device.ecore" name="pin_tool.EFR32ZG23B020F512IM48" partId="mcu.arm.efr32.zg23.efr32zg23b020f512im48" contextId="com.silabs.sdk.stack.sisdk:2024.6.2._2098706795">
+  <mode name="DefaultMode">
+    <property object="DefaultMode" propertyId="mode.diagramLocation" value="100, 100"/>
+    <property object="GPIO" propertyId="ABModule.selectedRequirement" value="gpio%T%SL_DEBUG%T%sl_debug_swo_config.h"/>
+    <property object="GPIO" propertyId="ABPeripheral.included" value="true"/>
+    <property object="PA00" propertyId="ABModule.selectedRequirement" value="gpio%T%RF_SDN%T%ezradiodrv_config.h"/>
+    <property object="PA05" propertyId="ABModule.selectedRequirement" value="gpio%T%RF_GPIO0%T%ezradiodrv_config.h"/>
+    <property object="PA05" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PA10" propertyId="ABModule.selectedRequirement" value="gpio%T%RF_INT%T%ezradiodrv_config.h"/>
+    <property object="PA10" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PB00" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PB01" propertyId="ABModule.selectedRequirement" value="gpio%T%SL_SIMPLE_BUTTON_BTN0%T%sl_simple_button_btn0_config.h"/>
+    <property object="PB01" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PB02" propertyId="ABModule.selectedRequirement" value="gpio%T%SL_SIMPLE_LED_LED0%T%sl_simple_led_led0_config.h"/>
+    <property object="PB02" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PB03" propertyId="ABModule.selectedRequirement" value="gpio%T%SL_SIMPLE_BUTTON_BTN1%T%sl_simple_button_btn1_config.h"/>
+    <property object="PB03" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PC04" propertyId="ABModule.selectedRequirement" value="gpio%T%SL_MX25_FLASH_SHUTDOWN_CS%T%sl_mx25_flash_shutdown_usart_config.h"/>
+    <property object="PC04" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PC09" propertyId="ABModule.selectedRequirement" value="gpio%T%SL_BOARD_ENABLE_SENSOR_RHT%T%sl_board_control_config.h"/>
+    <property object="PC09" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PD02" propertyId="ABModule.selectedRequirement" value="gpio%T%RF_GPIO1%T%ezradiodrv_config.h"/>
+    <property object="PD02" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PD03" propertyId="ABModule.selectedRequirement" value="gpio%T%SL_SIMPLE_LED_LED1%T%sl_simple_led_led1_config.h"/>
+    <property object="PD03" propertyId="pin.reserve" value="Reserved"/>
+    <property object="PORTIO" propertyId="portio.gpio.enable.swv" value="Enabled"/>
+    <property object="PORTIO" propertyId="portio.usart0.enable.clk" value="Enabled"/>
+    <property object="PORTIO" propertyId="portio.usart0.enable.cs" value="Enabled"/>
+    <property object="PORTIO" propertyId="portio.usart0.enable.rx" value="Enabled"/>
+    <property object="PORTIO" propertyId="portio.usart0.enable.tx" value="Enabled"/>
+    <property object="PORTIO" propertyId="portio.usart0.location.clk" value="35"/>
+    <property object="PORTIO" propertyId="portio.usart0.location.cs" value="32"/>
+    <property object="PORTIO" propertyId="portio.usart0.location.rx" value="34"/>
+    <property object="PORTIO" propertyId="portio.usart0.location.tx" value="33"/>
+    <property object="TIMER0" propertyId="ABModule.selectedRequirement" value="timer%T%USTIMER%T%ustimer_config.h"/>
+    <property object="TIMER0" propertyId="ABPeripheral.included" value="true"/>
+    <property object="USART0" propertyId="ABModule.selectedRequirement" value="usart%T%SL_SPIDRV_EXP%T%sl_spidrv_exp_config.h"/>
+    <property object="USART0" propertyId="ABPeripheral.included" value="true"/>
+  </mode>
+  <modeTransition>
+    <property object="RESET &#x2192; DefaultMode" propertyId="modeTransition.source" value="RESET"/>
+    <property object="RESET &#x2192; DefaultMode" propertyId="modeTransition.target" value="DefaultMode"/>
+  </modeTransition>
+</device:XMLDevice>

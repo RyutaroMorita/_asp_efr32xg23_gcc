@@ -1,0 +1,7 @@
+---
+label: "Si4x63_EFM32PG23_EZRadioDriver"
+quality: "unknown"
+project:
+- id: "main"
+  path: "Si4x63_PCLE20_FG23_EZRadioDriver.slcp"
+  output: "."
