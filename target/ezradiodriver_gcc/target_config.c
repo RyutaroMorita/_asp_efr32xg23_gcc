@@ -46,6 +46,7 @@
 #include <sil.h>
 #include "target_syssvc.h"
 #include "target_serial.h"
+//#include "sl_component_catalog.h" // 参照しなくてもビルドが通るため要注意！
 #include "sl_system_init.h"
 #include "em_cmu.h"
 #include "em_gpio.h"
@@ -79,7 +80,13 @@ hardware_init_hook(void) {
 void
 target_initialize(void)
 {
-	/*
+  /*
+   *  使用するペリフェラルにクロックを供給
+   */
+  //CMU_ClockEnable(cmuClock_GPIO, true);
+  //CMU_ClockEnable(cmuClock_EUSART1, true);
+
+  /*
 	 *  HALによる初期化
 	 *  HAL_Init() : stm32f4xx_hal.c の内容から必要な初期化のみ呼び出す．
 	 */

@@ -86,13 +86,23 @@ static void appPacketReceivedCallback(EZRADIODRV_Handle_t handle, Ecode_t status
  */
 void main_task(intptr_t exinf)
 {
-  ena_int(INTNO_TIMER0);
+  ena_int(INTNO_GPIO_EVEN);
   ena_int(INTNO_LDMA);
   ena_int(INTNO_RTC);
+  ena_int(INTNO_TIMER0);
 
   appRadioInitData.packetTx.userCallback = &appPacketTransmittedCallback;
   appRadioInitData.packetRx.userCallback = &appPacketReceivedCallback;
   appRadioInitData.packetRx.pktBuf = radioRxPkt;
+
+  /*
+   *  em_cmu.c 818çsñ⁄
+   *
+   *  cmuClock_LFRCO  54
+   *  cmuClock_LDMA 32
+   *  cmuClock_LDMAXBAR 33
+   *  cmuClock_TIMER0 36 <- ï°êîâÒóàÇÈÇÃÇ™ê≥ÇµÇ¢
+   */
 
   //Initializing Si4x6x
   ezradioInit(appRadioHandle);
@@ -111,14 +121,12 @@ void timer0_handler(void)
 
 void gpio_odd_handler(void)
 {
-  //i_begin_int(INTNO_GPIO_ODD);
-  //i_end_int(INTNO_GPIO_ODD);
+  GPIO_ODD_IRQHandler();
 }
 
 void gpio_even_handler(void)
 {
-  //i_begin_int(INTNO_GPIO_EVEN);
-  //i_end_int(INTNO_GPIO_EVEN);
+  GPIO_EVEN_IRQHandler();
 }
 
 void ldma_handler(void)

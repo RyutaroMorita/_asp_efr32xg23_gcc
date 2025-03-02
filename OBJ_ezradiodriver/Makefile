@@ -136,7 +136,7 @@ CFG2_OUT_SRCS := kernel_cfg.h kernel_cfg.c $(CFG2_OUT_SRCS)
 #
 #  共通コンパイルオプションの定義
 #
-COPTS := $(COPTS) -g -gdwarf-2
+COPTS := $(COPTS) -g -gdwarf-2 -DSL_COMPONENT_CATALOG_PRESENT -DSL_CODE_COMPONENT_PERIPHERAL_SYSRTC=hal_sysrtc
 ifndef OMIT_WARNING_ALL
   COPTS := $(COPTS) -Wall
 endif
@@ -161,6 +161,7 @@ APPL_SRCS = 	$(APPLNAME).o
 APPL_DIR = \
 	$(APPLDIR) \
 	$(SRCDIR)/library \
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/hardware/driver/mx25_flash_shutdown/src/sl_mx25_flash_shutdown_usart \
 	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/driver/button/src \
 	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/driver/leddrv/src \
 	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/dmadrv/src \
@@ -170,9 +171,10 @@ APPL_DIR = \
 	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/gpiointerrupt/src \
 	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/spidrv/src \
 	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/ustimer/src \
-	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/service/device_manager/devices
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/service/device_manager/devices \
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/service/udelay/src
 	
-APPL_ASMOBJS =
+APPL_ASMOBJS = 	sl_udelay_armv6m_gcc.o
 ifdef USE_CXX
   #APPL_CXXOBJS = $(APPLNAME).o 
   APPL_CXXOBJS = $(APPL_SRCS)
@@ -196,6 +198,7 @@ APPL_COBJS := $(APPL_COBJS) log_output.o vasyslog.o t_perror.o strerror.o syscal
 	sl_device_peripheral_hal_$(PRC).o \
 	sl_hal_sysrtc.o \
 	sl_led.o \
+	sl_mx25_flash_shutdown.o \
 	sl_simple_button.o \
 	sl_simple_button_instances.o \
 	sl_simple_led.o \
@@ -203,6 +206,7 @@ APPL_COBJS := $(APPL_COBJS) log_output.o vasyslog.o t_perror.o strerror.o syscal
 	sl_sleeptimer.o \
 	sl_sleeptimer_hal_sysrtc.o \
 	sl_spidrv_init.o \
+	sl_udelay.o \
 	spidrv.o \
 	ustimer.o
 
@@ -213,6 +217,7 @@ ifdef APPLDIR
 endif
 INCLUDES := \
 	$(INCLUDES) \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/hardware/driver/mx25_flash_shutdown/inc/sl_mx25_flash_shutdown_usart \
 	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/driver/button/inc \
 	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/driver/leddrv/inc \
 	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/common/inc \
@@ -224,7 +229,8 @@ INCLUDES := \
 	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/ezradiodrv/si4463/inc \
 	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/gpiointerrupt/inc \
 	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/spidrv/inc \
-	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/ustimer/inc
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/ustimer/inc \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/service/udelay/inc
 
 #
 #  システムサービスに関する定義
