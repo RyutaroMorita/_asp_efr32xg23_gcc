@@ -1,0 +1,25 @@
+#CRC Codes for initially generated config files -- do not modify!
+dmadrv_config.h=1207334949
+emlib_core_debug_config.h=-212744839
+ezradiodrv_config.h=-583382951
+sl_clock_manager_oscillator_config.h=-159536615
+sl_clock_manager_tree_config.h=-941870403
+sl_core_config.h=-119586893
+sl_device_init_dcdc_config.h=-1580606003
+sl_device_init_emu_config.h=622680131
+sl_interrupt_manager_s2_config.h=1560337863
+sl_memory_config.h=-1757257759
+sl_memory_manager_region_config.h=1585140969
+sl_simple_led_led_greed_config.h=1680109069
+sl_simple_led_led_green_config.h=973409234
+sl_simple_led_led_red_config.h=-1262827359
+sl_simple_led_pc00_config.h=2083605050
+sl_simple_led_pc01_config.h=2090212588
+sl_sleeptimer_config.h=1360009810
+sl_spidrv_eusart_sl_spidrv_exp_config.h=797121859
+sl_spidrv_exp_config.h=878861014
+sl_uartdrv_eusart_eusart0_config.h=-665969072
+sl_uartdrv_eusart_uart1_config.h=-1561990784
+spidrv_config.h=112055036
+uartdrv_config.h=-941504238
+ustimer_config.h=2106674886

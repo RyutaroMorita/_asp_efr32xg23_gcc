@@ -8,6 +8,7 @@
 BOARD = brd4002a+efr32zg23
 PRC   = efr32xg23
 DEVICE = EFR32ZG23
+DEVICE_S = efr32zg23
 PROJECT = project
 MODEL = $(DEVICE)B020F512IM48
 TOOL  = gcc
@@ -94,7 +95,7 @@ KERNEL_COBJS := $(KERNEL_COBJS) \
 	sl_event_handler.o \
 	sl_interrupt_manager_cortexm.o \
 	sl_system_init.o \
-	system_efr32zg23.o \
+	system_$(DEVICE_S).o \
 	target_config.o
 KERNEL_CFLAGS := $(KERNEL_CFLAGS)
 

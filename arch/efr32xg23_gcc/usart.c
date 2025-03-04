@@ -79,7 +79,7 @@ SIOPCB siopcb_table[TNUM_PORT];
 static const SIOPINIB siopinib_table[TNUM_PORT] = {
     {
         EUSART0,
-        1,
+        0,
         gpioPortA,
         8,
         gpioPortA,

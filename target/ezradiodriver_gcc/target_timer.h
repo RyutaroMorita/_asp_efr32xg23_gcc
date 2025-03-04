@@ -58,6 +58,6 @@
 /*
  *  プロセッサ依存部で定義する
  */
-#include "arm_m_gcc/common/core_timer.h"
+#include "efr32xg23_gcc/prc_timer.h"
 
 #endif /* TOPPERS_TARGET_TIMER_H */

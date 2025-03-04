@@ -51,6 +51,6 @@
 /*
  *  コア依存モジュール（ARM-M用）
  */
-#include "arm_m_gcc/common/core_test.h"
+#include "efr32xg23_gcc/prc_test.h"
 
 #endif /* TOPPERS_TARGET_TEST_H */

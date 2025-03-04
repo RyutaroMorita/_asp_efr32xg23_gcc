@@ -191,7 +191,9 @@ APPL_COBJS := $(APPL_COBJS) log_output.o vasyslog.o t_perror.o strerror.o syscal
 	ezradio_api_lib_add.o \
 	ezradio_comm.o \
 	ezradio_hal.o \
-	t_ezradio_plugin_manager.o \
+	ezradio_receive_plugin.o \
+	ezradio_transmit_plugin.o \
+	ezradio_unmod_carrier_plugin.o \
 	gpiointerrupt.o \
 	sl_button.o \
 	sl_device_peripheral.o \
@@ -208,6 +210,7 @@ APPL_COBJS := $(APPL_COBJS) log_output.o vasyslog.o t_perror.o strerror.o syscal
 	sl_spidrv_init.o \
 	sl_udelay.o \
 	spidrv.o \
+	t_ezradio_plugin_manager.o \
 	ustimer.o
 
 APPL_CFLAGS =

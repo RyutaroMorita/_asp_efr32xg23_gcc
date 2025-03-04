@@ -50,12 +50,16 @@
 #include "ezradio_cmd.h"
 #include "ezradio_api_lib.h"
 #include "ezradio_plugin_manager.h"
+//#include "ezradio_prop.h"
 #include "main.h"
 
+//#define TEST_LDMA
+
+//#ifdef TEST_LDMA
 #include "em_cmu.h"
 #include "em_emu.h"
 #include "em_eusart.h"
-
+//#endif  // TEST_LDMA
 
 //Radio initialization data
 EZRADIODRV_HandleData_t appRadioInitData = EZRADIODRV_INIT_DEFAULT;
@@ -202,18 +206,25 @@ void initLDMA(void)
   LDMA_Init(&ldmaInit);
 
   // Source is outbuf, destination is EUSART2_TXDATA, and length if BUFLEN
-  ldmaTXDescriptor = (LDMA_Descriptor_t)LDMA_DESCRIPTOR_SINGLE_M2P_BYTE(outbuf, &(EUSART2->TXDATA), BUFLEN);
+  //ldmaTXDescriptor = (LDMA_Descriptor_t)LDMA_DESCRIPTOR_SINGLE_M2P_BYTE(outbuf, &(EUSART2->TXDATA), BUFLEN);
+  ldmaTXDescriptor = (LDMA_Descriptor_t)LDMA_DESCRIPTOR_SINGLE_M2P_BYTE(outbuf, &(USART0->TXDATA), BUFLEN);
 
   // Transfer a byte on free space in the EUSART FIFO
-  ldmaTXConfig = (LDMA_TransferCfg_t)LDMA_TRANSFER_CFG_PERIPHERAL(ldmaPeripheralSignal_EUSART2_TXFL);
+  //ldmaTXConfig = (LDMA_TransferCfg_t)LDMA_TRANSFER_CFG_PERIPHERAL(ldmaPeripheralSignal_EUSART2_TXFL);
+  //ldmaTXConfig = (LDMA_TransferCfg_t)LDMA_TRANSFER_CFG_PERIPHERAL(dmadrvPeripheralSignal_EUSART2_TXBL);
+  ldmaTXConfig = (LDMA_TransferCfg_t)LDMA_TRANSFER_CFG_PERIPHERAL(dmadrvPeripheralSignal_USART0_TXBL);
 
   // Source is EUSART2_RXDATA, destination is inbuf, and length if BUFLEN
-  ldmaRXDescriptor = (LDMA_Descriptor_t)LDMA_DESCRIPTOR_SINGLE_P2M_BYTE(&(EUSART2->RXDATA), inbuf, BUFLEN);
+  //ldmaRXDescriptor = (LDMA_Descriptor_t)LDMA_DESCRIPTOR_SINGLE_P2M_BYTE(&(EUSART2->RXDATA), inbuf, BUFLEN);
+  ldmaRXDescriptor = (LDMA_Descriptor_t)LDMA_DESCRIPTOR_SINGLE_P2M_BYTE(&(USART0->RXDATA), inbuf, BUFLEN);
 
   // Transfer a byte on receive FIFO level event
-  ldmaRXConfig = (LDMA_TransferCfg_t)LDMA_TRANSFER_CFG_PERIPHERAL(ldmaPeripheralSignal_EUSART2_RXFL);
+  //ldmaRXConfig = (LDMA_TransferCfg_t)LDMA_TRANSFER_CFG_PERIPHERAL(ldmaPeripheralSignal_EUSART2_RXFL);
+  //ldmaRXConfig = (LDMA_TransferCfg_t)LDMA_TRANSFER_CFG_PERIPHERAL(dmadrvPeripheralSignal_EUSART2_RXDATAV);
+  ldmaRXConfig = (LDMA_TransferCfg_t)LDMA_TRANSFER_CFG_PERIPHERAL(dmadrvPeripheralSignal_USART0_RXDATAV);
 }
 
+#ifdef TEST_LDMA
 /**************************************************************************//**
  * @brief LDMA IRQHandler
  *****************************************************************************/
@@ -240,6 +251,7 @@ void ldma_handler(void)
   if (flags & LDMA_IF_ERROR)
     __BKPT(0);
 }
+#endif  // TEST_LDMA
 
 void timer0_handler(void)
 {
@@ -256,12 +268,14 @@ void gpio_even_handler(void)
   GPIO_EVEN_IRQHandler();
 }
 
-/*
+#ifdef TEST_LDMA
+  //
+#else // TEST_LDMA
 void ldma_handler(void)
 {
   LDMA_IRQHandler();
 }
-*/
+#endif  // TEST_LDMA
 
 void rtc_handler(void)
 {
@@ -278,34 +292,40 @@ void main_task(intptr_t exinf)
 
   ena_int(INTNO_GPIO_EVEN);
   ena_int(INTNO_LDMA);
-  ena_int(INTNO_RTC);
+  //ena_int(INTNO_RTC);
   ena_int(INTNO_TIMER0);
 
+#ifdef TEST_LDMA
   initGPIO();
-  initEUSART2();
+  //initEUSART2();
   initLDMA();
+#endif  // TEST_LDMA
 
   appRadioInitData.packetTx.userCallback = &appPacketTransmittedCallback;
   appRadioInitData.packetRx.userCallback = &appPacketReceivedCallback;
   appRadioInitData.packetRx.pktBuf = radioRxPkt;
 
-  /*
-   *  em_cmu.c 818çsñ⁄
-   *
-   *  cmuClock_LFRCO  54
-   *  cmuClock_LDMA 32
-   *  cmuClock_LDMAXBAR 33
-   *  cmuClock_TIMER0 36 <- ï°êîâÒóàÇÈÇÃÇ™ê≥ÇµÇ¢
-   */
-
+#ifdef TEST_LDMA
+  //
+#else // TEST_LDMA
   //Initializing Si4x6x
-  //ezradioInit(appRadioHandle);
+  ezradioInit(appRadioHandle);
 
-  //EMU_EnterEM1();
+  ezradio_part_info(&ezradioReply);
+
+  ezradioResetTRxFifo();
+
+  EZRADIODRV_PacketLengthConfig_t pktLengthConf = { ezradiodrvTransmitLenghtDefault, 16, {16,0,0,0,0} };
+  ezradioLengthConfig(appRadioHandle, pktLengthConf);
+
+  //Start RX
+  ezradioStartRx(appRadioHandle);
+#endif  // TEST_LDMA
 
   while (1) {
-    syslog(LOG_NOTICE, "main_task is running.");
+      syslog(LOG_NOTICE, "main_task is running.");
 
+#ifdef TEST_LDMA
     // Set the receive state to not done
     rx_done = false;
 
@@ -330,7 +350,8 @@ void main_task(intptr_t exinf)
     LDMA_StartTransfer(TX_LDMA_CHANNEL, &ldmaTXConfig, &ldmaTXDescriptor);
     // Wait in EM1 until all data is received
     while (!rx_done) {
-      EMU_EnterEM1();
+        dly_tsk(1);
+//      EMU_EnterEM1();
     }
 
     // De-assert chip select upon final byte reception (drive high)
@@ -339,5 +360,13 @@ void main_task(intptr_t exinf)
     GPIO_PinOutSet(EUS1CS_PORT, EUS1CS_PIN);
 
     dly_tsk(1000);
+#else // TEST_LDMA
+
+    ezradioStartUnmodulatedCarrier(appRadioHandle);
+    dly_tsk(4000 - 2000);
+    ezradioStopUnmodulatedCarrier();
+    dly_tsk(2000);
+
+#endif  // TEST_LDMA
   }
 }
