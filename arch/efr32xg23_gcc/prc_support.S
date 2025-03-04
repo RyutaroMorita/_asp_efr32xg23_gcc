@@ -725,9 +725,11 @@ ALABEL(dispatcher_2)
 #else
 	cpsid i								/* PRIMASK をセット */
 	msr   basepri, r4					/* 全割込み許可 */
+	nop
 	wfi
 	cpsie i								/* PRIMASK をクリア（割込みを受け付ける） */
 	msr   basepri, r5					/* CPUロック状態へ */
+	nop
 #endif /* TOPPERS_CUSTOM_IDLE */
 
 	ldr   r0, [r6]						/* reqflgがfalseならdispatcher_2へ */

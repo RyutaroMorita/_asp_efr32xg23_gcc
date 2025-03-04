@@ -72,6 +72,7 @@
  */
 #define SIL_DLY_TIM1    162
 #define SIL_DLY_TIM2    100
+#define INIT_MSP
 
 /*
  *  使用するシリアルポートID

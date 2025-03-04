@@ -93,7 +93,8 @@
 
 #define INHNO_LDMA        (LDMA_IRQn + 16)
 #define INTNO_LDMA        (LDMA_IRQn + 16)
-#define INTPRI_LDMA       -8        /* Š„‚İ—Dæ“x */
+//#define INTPRI_LDMA       -8        /* Š„‚İ—Dæ“x */
+#define INTPRI_LDMA       -3        /* Š„‚İ—Dæ“x */
 #define INTATR_LDMA       (TA_NULL) /* Š„‚İ‘®« */
 
 #define INHNO_RTC         (SYSRTC_APP_IRQn + 16)
