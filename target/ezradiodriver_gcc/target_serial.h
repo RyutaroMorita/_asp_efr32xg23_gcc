@@ -58,8 +58,8 @@
 #define INTATR_SIO    (TA_NULL)             /* 割込み属性 */
 
 /*
- *  チップ依存モジュール
+ *  ターゲット依存モジュール
  */
-#include "arm_m_gcc/efr32xg23/usart.h"
+#include "usart.h"
 
 #endif /* TOPPERS_TARGET_SERIAL_H */

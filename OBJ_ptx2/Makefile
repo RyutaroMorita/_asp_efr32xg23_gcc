@@ -48,7 +48,7 @@ all:
 #
 #  ターゲット略称の定義
 #
-TARGET = brd4002a+efr32zg23_gcc
+TARGET = ptx2_gcc
 
 #
 #  プログラミング言語の定義
@@ -136,7 +136,7 @@ CFG2_OUT_SRCS := kernel_cfg.h kernel_cfg.c $(CFG2_OUT_SRCS)
 #
 #  共通コンパイルオプションの定義
 #
-COPTS := $(COPTS) -g -gdwarf-2
+COPTS := $(COPTS) -g -gdwarf-2 -DSL_COMPONENT_CATALOG_PRESENT -DSL_CODE_COMPONENT_PERIPHERAL_SYSRTC=hal_sysrtc
 ifndef OMIT_WARNING_ALL
   COPTS := $(COPTS) -Wall
 endif
@@ -153,13 +153,26 @@ CFLAGS = $(COPTS) $(CDEFS) $(INCLUDES)
 #
 #  アプリケーションプログラムに関する定義
 #
-APPLNAME = sample1
+APPLNAME = main
 APPLDIR = 
 APPL_CFG = $(APPLNAME).cfg
 APPL_SRCS = 	$(APPLNAME).o
 
-APPL_DIR = $(APPLDIR) $(SRCDIR)/library
-APPL_ASMOBJS =
+APPL_DIR = \
+	$(APPLDIR) \
+	$(SRCDIR)/library \
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/driver/leddrv/src \
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/dmadrv/src \
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/ezradiodrv/common/src \
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/ezradiodrv/common/src/si4x6x \
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/ezradiodrv/plugins/src \
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/gpiointerrupt/src \
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/spidrv/src \
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/ustimer/src \
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/service/device_manager/devices \
+	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/service/udelay/src
+	
+APPL_ASMOBJS = 	sl_udelay_armv6m_gcc.o
 ifdef USE_CXX
   #APPL_CXXOBJS = $(APPLNAME).o 
   APPL_CXXOBJS = $(APPL_SRCS)
@@ -168,12 +181,53 @@ else
   #APPL_COBJS = $(APPLNAME).o
   APPL_COBJS = $(APPL_SRCS)
 endif
-APPL_COBJS := $(APPL_COBJS) log_output.o vasyslog.o t_perror.o strerror.o
+APPL_COBJS := $(APPL_COBJS) log_output.o vasyslog.o t_perror.o strerror.o syscalls.o \
+	dmadrv.o \
+	em_ldma.o \
+	em_timer.o \
+	ezradio_api_lib.o \
+	ezradio_api_lib_add.o \
+	ezradio_comm.o \
+	ezradio_hal.o \
+	ezradio_receive_plugin.o \
+	ezradio_transmit_plugin.o \
+	ezradio_unmod_carrier_plugin.o \
+	gpiointerrupt.o \
+	sl_device_peripheral.o \
+	sl_device_peripheral_hal_$(PRC).o \
+	sl_hal_sysrtc.o \
+	sl_led.o \
+	sl_simple_led.o \
+	sl_simple_led_instances.o \
+	sl_sleeptimer.o \
+	sl_sleeptimer_hal_sysrtc.o \
+	sl_spidrv_init.o \
+	sl_udelay.o \
+	spidrv.o \
+	t_ezradio_plugin_manager.o \
+	ustimer.o
+
 APPL_CFLAGS =
 APPL_LIBS =
 ifdef APPLDIR
   INCLUDES := $(INCLUDES) $(foreach dir,$(APPLDIR),-I$(dir))
 endif
+INCLUDES := \
+	$(INCLUDES) \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/hardware/driver/mx25_flash_shutdown/inc/sl_mx25_flash_shutdown_usart \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/driver/button/inc \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/driver/leddrv/inc \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/common/inc \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/dmadrv/inc \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/dmadrv/inc/s2_signals \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/ezradiodrv/common/inc \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/ezradiodrv/common/inc/si4x6x \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/ezradiodrv/plugins/inc \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/ezradiodrv/si4463/inc \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/gpiointerrupt/inc \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/spidrv/inc \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emdrv/ustimer/inc \
+	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/service/udelay/inc
 
 #
 #  システムサービスに関する定義

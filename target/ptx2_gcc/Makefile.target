@@ -6,7 +6,7 @@
 #  ボード名, チップ名，コア名，開発環境名の定義
 #
 BOARD = ptx2
-PRC   = efm32pg23
+PRC   = efr32xg23
 DEVICE = EFM32PG23
 DEVICE_S = efm32pg23
 PROJECT = Si4x63_PCLE20_PG23_EZRadioDriver
@@ -31,7 +31,6 @@ INCLUDES := $(INCLUDES) \
 	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/CMSIS/Core/Include \
 	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/common/inc \
 	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/Device/SiliconLabs/$(DEVICE)/Include \
-	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/driver/debug/inc \
 	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/emlib/inc \
 	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/peripheral/inc \
 	-I$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/service/clock_manager/inc \
@@ -58,8 +57,6 @@ LDFLAGS := $(LDFLAGS) -Wl,--gc-sections
 KERNEL_DIR := $(KERNEL_DIR) \
 	$(TARGETDIR) \
 	$(TARGETDIR)/$(PROJECT)/autogen \
-	$(TARGETDIR)/$(PROJECT)/$(SDK)/hardware/board/src \
-	$(TARGETDIR)/$(PROJECT)/$(SDK)/hardware/driver/configuration_over_swo/src \
 	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/common/src \
 	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/Device/SiliconLabs/$(DEVICE)/Source \
 	$(TARGETDIR)/$(PROJECT)/$(SDK)/platform/driver/debug/src \
@@ -79,16 +76,11 @@ KERNEL_COBJS := $(KERNEL_COBJS) \
 	em_eusart.o \
 	em_gpio.o \
 	em_usart.o \
-	sl_board_control_gpio.o \
-	sl_board_default_init.o \
-	sl_board_init.o \
 	sl_clock_manager.o \
 	sl_clock_manager_hal_s2.o \
 	sl_clock_manager_init.o \
 	sl_clock_manager_init_hal_s2.o \
 	sl_core_cortexm.o \
-	sl_cos.o \
-	sl_debug_swo.o \
 	sl_device_clock_$(PRC).o \
 	sl_device_init_dcdc_s2.o \
 	sl_device_init_emu_s2.o \

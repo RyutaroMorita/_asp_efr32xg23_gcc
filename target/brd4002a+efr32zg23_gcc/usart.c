@@ -261,36 +261,36 @@ sio_rcv_chr(SIOPCB *p_siopcb)
  *  コールバックの許可
  */
 void
-sio_ena_cbr(SIOPCB *siopcb, uint_t cbrtn)
+sio_ena_cbr(SIOPCB *p_siopcb, uint_t cbrtn)
 {
-	switch (cbrtn) {
-	case SIO_RDY_SND:
-	  EUSART_IntEnable(EUSART1, EUSART_IEN_TXFL);
-		break;
-	case SIO_RDY_RCV:
-	  EUSART_IntEnable(EUSART1, EUSART_IEN_RXFL);
-		break;
-	default:
-		break;
-	}
+  switch (cbrtn) {
+  case SIO_RDY_SND:
+    EUSART_IntEnable(p_siopcb->p_siopinib->p_eusart, EUSART_IEN_TXFL);
+    break;
+  case SIO_RDY_RCV:
+    EUSART_IntEnable(p_siopcb->p_siopinib->p_eusart, EUSART_IEN_RXFL);
+    break;
+  default:
+    break;
+  }
 }
 
 /* 
  *  コールバックの禁止
  */
 void
-sio_dis_cbr(SIOPCB *siopcb, uint_t cbrtn)
+sio_dis_cbr(SIOPCB *p_siopcb, uint_t cbrtn)
 {
-	switch (cbrtn) {
-	case SIO_RDY_SND:
-	  EUSART_IntDisable(EUSART1, EUSART_IEN_TXFL);
-		break;
-	case SIO_RDY_RCV:
-	  EUSART_IntDisable(EUSART1, EUSART_IEN_RXFL);
-		break;
-	default:
-		break;
-	}
+  switch (cbrtn) {
+  case SIO_RDY_SND:
+    EUSART_IntDisable(p_siopcb->p_siopinib->p_eusart, EUSART_IEN_TXFL);
+    break;
+  case SIO_RDY_RCV:
+    EUSART_IntDisable(p_siopcb->p_siopinib->p_eusart, EUSART_IEN_RXFL);
+    break;
+  default:
+    break;
+  }
 }
 
 /*

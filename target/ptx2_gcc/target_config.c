@@ -46,13 +46,12 @@
 #include <sil.h>
 #include "target_syssvc.h"
 #include "target_serial.h"
-//#include "sl_component_catalog.h" // 参照しなくてもビルドが通るため要注意！
 #include "sl_system_init.h"
 #include "em_cmu.h"
 #include "em_gpio.h"
 #include "em_eusart.h"
-#include "sl_board_control_config.h"
-#include "sl_mx25_flash_shutdown.h"
+//#include "sl_board_control_config.h"
+//#include "sl_mx25_flash_shutdown.h"
 
 /*
  *  バーナ出力用のUARTの初期化
@@ -126,7 +125,7 @@ target_initialize(void)
 	 *  使用するペリフェラルにクロックを供給
 	 */
 	CMU_ClockEnable(cmuClock_GPIO, true);
-  CMU_ClockEnable(cmuClock_EUSART1, true);
+  CMU_ClockEnable(cmuClock_EUSART0, true);
 
   /*
    *  使用する GPIO の設定
@@ -140,12 +139,14 @@ target_initialize(void)
    * To disable the VCOM connection and use the pins on the kit
    * expansion (EXP) header, comment out the following line.
    */
+#if 0
   GPIO_PinModeSet(
       SL_BOARD_ENABLE_VCOM_PORT,
       SL_BOARD_ENABLE_VCOM_PIN,
       gpioModePushPull,
       1
   );
+#endif
 
 	/*
 	 *  バーナー出力用のシリアル初期化

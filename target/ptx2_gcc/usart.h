@@ -3,7 +3,7 @@
  *      Toyohashi Open Platform for Embedded Real-Time Systems/
  *      Advanced Standard Profile Kernel
  * 
- *  Copyright (C) 2007,2011,2015 by Embedded and Real-Time Systems Laboratory
+ *  Copyright (C) 2007,2011,2013,2015 by Embedded and Real-Time Systems Laboratory
  *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
  *  上記著作権者は，以下の(1)～(4)の条件を満たす場合に限り，本ソフトウェ
@@ -38,19 +38,90 @@
  */
 
 /*
- *		テストプログラムのターゲット依存定義（PTX2 試作品用）
+ *  シリアルI/Oデバイス（SIO）ドライバ（EFR32xG23用）
  */
 
-#ifndef TOPPERS_TARGET_TEST_H
-#define TOPPERS_TARGET_TEST_H
-
-#define STACK_SIZE			(1024)
-
-#define TASK_PORTID      1
+#ifndef TOPPERS_USART_H
+#define TOPPERS_USART_H
 
 /*
- *  コア依存モジュール（ARM-M用）
+ *  コールバックルーチンの識別番号
  */
-#include "efr32xg23_gcc/prc_test.h"
+#define SIO_RDY_SND    1U        /* 送信可能コールバック */
+#define SIO_RDY_RCV    2U        /* 受信通知コールバック */
 
-#endif /* TOPPERS_TARGET_TEST_H */
+#ifndef TOPPERS_MACRO_ONLY
+
+/*
+ *  シリアルI/Oポート管理ブロックの定義
+ */
+typedef struct sio_port_control_block    SIOPCB;
+
+/*
+ *  SIO初期化
+ */
+extern void sio_initialize(intptr_t exinf);
+
+/*
+ * カーネル起動時のバナー出力用の初期化
+ */
+extern void sio_uart_init(ID siopid, uint32_t bitrate);
+
+/*
+ *  シリアルオープン
+ */
+extern SIOPCB *sio_opn_por(ID siopid, intptr_t exinf);
+
+/*
+ *  シリアルクローズ
+ */
+extern void sio_cls_por(SIOPCB* p_siopcb);
+
+/*
+ *  割込みハンドラ
+ */
+extern void sio_tx_isr(intptr_t exinf);
+extern void sio_rx_isr(intptr_t exinf);
+
+/*
+ *  1文字送信
+ */
+extern bool_t sio_snd_chr(SIOPCB* p_siopcb, char c);
+
+/*
+ *  1文字受信
+ */
+extern int_t sio_rcv_chr(SIOPCB* p_siopcb);
+
+/*
+ *  コールバックの許可
+ */
+extern void sio_ena_cbr(SIOPCB* p_siopcb, uint_t cbrtn);
+
+/* 
+ *  コールバックの禁止
+ */
+extern void sio_dis_cbr(SIOPCB* p_siopcb, uint_t cbrtn);
+
+/*
+ *  送信可能コールバック
+ */
+extern void sio_irdy_snd(intptr_t exinf);
+
+/*
+ *  受信通知コールバック
+ */
+extern void sio_irdy_rcv(intptr_t exinf);
+
+/*
+ *  1文字送信（ポーリングでの出力）
+ */
+extern void sio_pol_snd_chr(char c, ID siopid);
+
+/*
+ *  ターゲットのシリアル初期化
+ */
+extern void usart_init(ID siopid);
+
+#endif /* TOPPERS_MACRO_ONLY */
+#endif /* TOPPERS_USART_H */

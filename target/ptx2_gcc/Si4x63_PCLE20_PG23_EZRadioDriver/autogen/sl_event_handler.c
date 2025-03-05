@@ -10,7 +10,6 @@
 #include "gpiointerrupt.h"
 #include "sl_simple_led_instances.h"
 #include "sl_spidrv_instances.h"
-#include "sl_uartdrv_instances.h"
 
 void sl_platform_init(void)
 {
@@ -27,7 +26,6 @@ void sl_driver_init(void)
   GPIOINT_Init();
   sl_simple_led_init_instances();
   sl_spidrv_init_instances();
-  sl_uartdrv_init_instances();
 }
 
 void sl_service_init(void)

@@ -50,7 +50,7 @@
 /*
  *  起動メッセージのターゲットシステム名
  */
-#define TARGET_NAME    "BRD4002A + EFR32ZG23"
+#define TARGET_NAME    "PTX2"
 
 /*
  *  システムログの低レベル出力のための文字出力
@@ -62,13 +62,13 @@ extern void	target_fput_log(char c);
 /*
  *  シリアルポート数の定義
  */
-#define TNUM_PORT        (2)		/* サポートするシリアルポートの数 */
+#define TNUM_PORT        (1)		/* サポートするシリアルポートの数 */
 
 /*
  *  ログタスクが使用するポートID
  */
 //#define LOGTASK_PORTID   SIO_PORTID
-#define LOGTASK_PORTID   2
+#define LOGTASK_PORTID   1
 
 /*  
  *  ボーレート

@@ -35,8 +35,6 @@ component:
 - {id: sl_system}
 - instance: [exp]
   id: spidrv
-- instance: [eusart0]
-  id: uartdrv_eusart
 - {id: udelay}
 define:
 - {name: DEBUG_EFM}

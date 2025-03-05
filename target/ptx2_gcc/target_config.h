@@ -77,7 +77,7 @@
 /*
  *  使用するシリアルポートID
  */
-#define SIO_PORTID		(2)
+#define SIO_PORTID		(1)
 
 /*
  *  クロック

@@ -46,7 +46,6 @@
 #include <sil.h>
 #include "target_syssvc.h"
 #include "target_serial.h"
-//#include "sl_component_catalog.h" // 参照しなくてもビルドが通るため要注意！
 #include "sl_system_init.h"
 #include "em_cmu.h"
 #include "em_gpio.h"
