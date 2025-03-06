@@ -76,11 +76,6 @@
 #define LOOP_REF		ULONG_C(1000000)	/* 速度計測用のループ回数 */
 #endif /* LOOP_REF */
 
-#define INHNO_TIMER0      (TIMER0_IRQn + 16)
-#define INTNO_TIMER0      (TIMER0_IRQn + 16)
-#define INTPRI_TIMER0     -5        /* 割込み優先度 */
-#define INTATR_TIMER0     (TA_NULL) /* 割込み属性 */
-
 #define INHNO_GPIO_ODD    (GPIO_ODD_IRQn + 16)
 #define INTNO_GPIO_ODD    (GPIO_ODD_IRQn + 16)
 #define INTPRI_GPIO_ODD   -5        /* 割込み優先度 */
@@ -108,9 +103,7 @@
 #ifndef TOPPERS_MACRO_ONLY
 
 extern void	main_task(intptr_t exinf);
-extern void	udp_task(intptr_t exinf);
 
-extern void timer0_handler(void);
 extern void gpio_odd_handler(void);
 extern void gpio_even_handler(void);
 extern void ldma_handler(void);

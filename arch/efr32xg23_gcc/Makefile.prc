@@ -63,11 +63,11 @@ TOOLDIR = $(SRCDIR)/arch/$(TOOL)
 #
 #  コンパイルオプション
 #
-COPTS := $(COPTS) -mthumb -mcmse -std=c18
+COPTS := $(COPTS) -mthumb -mcmse -std=c18 --specs=nano.specs
 INCLUDES := $(INCLUDES) -I$(COREDIR) -I$(TOOLDIR)
 LDFLAGS := $(LDFLAGS) 
 CDEFS := $(CDEFS)
-LIBS := $(LIBS) -lgcc
+LIBS := $(LIBS) -lgcc -lnosys
 
 #
 #  カーネルに関する定義

@@ -43,6 +43,10 @@
 #include "ezradio_api_lib_add.h"
 #include "ezradio_plugin_manager.h"
 
+#ifdef TOPPERS_CORTEX_M33
+#include <kernel.h>
+#endif  // TOPPERS_CORTEX_M33
+
 /// @cond DO_NOT_INCLUDE_WITH_DOXYGEN
 
 /* Radio configuration data array. */
@@ -50,7 +54,11 @@ static const uint8_t Radio_Configuration_Data_Array[]  = \
   RADIO_CONFIGURATION_DATA_ARRAY;
 
 /* Radio interrupt receive flag */
+#ifdef TOPPERS_CORTEX_M33
+extern bool    ezradioIrqReceived;
+#else // TOPPERS_CORTEX_M33
 static bool    ezradioIrqReceived = false;
+#endif  // TOPPERS_CORTEX_M33
 
 #if (EZRADIO_PLUGIN_TRANSMIT)
 Ecode_t ezradioHandleTransmitPlugin(EZRADIODRV_Handle_t radioHandle, EZRADIODRV_ReplyHandle_t radioReplyHandle);
@@ -66,7 +74,11 @@ Ecode_t ezradioHandleCrcErrorPlugin(EZRADIODRV_Handle_t radioHandle, EZRADIODRV_
 
 static void ezradioPowerUp(void);
 
+#ifdef TOPPERS_CORTEX_M33
+extern void GPIO_EZRadio_INT_IRQHandler(uint8_t pin);
+#else // TOPPERS_CORTEX_M33
 static void GPIO_EZRadio_INT_IRQHandler(uint8_t pin);
+#endif  // TOPPERS_CORTEX_M33
 
 /// @endcond
 
@@ -94,11 +106,16 @@ void ezradioInit(EZRADIODRV_Handle_t handle)
     printf("ERROR: Radio configuration failed!\n");
 #endif
 
+#ifdef TOPPERS_CORTEX_M33
+    /* Delay for 10ms time */
+    dly_tsk(10);
+#else // TOPPERS_CORTEX_M33
     USTIMER_Init();
     /* Delay for 10ms time */
     USTIMER_Delay(10000u);
     /* Deinit ustimer */
     USTIMER_DeInit();
+#endif  // TOPPERS_CORTEX_M33
 
     /* Power Up the radio chip */
     ezradioPowerUp();
@@ -173,17 +190,25 @@ static void ezradioPowerUp(void)
   /* Hardware reset the chip */
   ezradio_reset();
 
+#ifdef TOPPERS_CORTEX_M33
+  /* Delay for preconfigured time */
+  dly_tsk(RADIO_CONFIG_DATA_RADIO_DELAY_AFTER_RESET_US / 1000);
+#else // TOPPERS_CORTEX_M33
   /* Initialize ustimer */
   USTIMER_Init();
   /* Delay for preconfigured time */
   USTIMER_Delay(RADIO_CONFIG_DATA_RADIO_DELAY_AFTER_RESET_US);
   /* Deinit ustimer */
   USTIMER_DeInit();
+#endif  // TOPPERS_CORTEX_M33
 }
 
 /**************************************************************************//**
  * @brief  Radio nIRQ GPIO interrupt.
  *****************************************************************************/
+#ifdef TOPPERS_CORTEX_M33
+//
+#else // TOPPERS_CORTEX_M33
 static void GPIO_EZRadio_INT_IRQHandler(uint8_t pin)
 {
   (void)pin;
@@ -191,5 +216,5 @@ static void GPIO_EZRadio_INT_IRQHandler(uint8_t pin)
   /* Sign radio interrupt received */
   ezradioIrqReceived = true;
 }
-
+#endif  // TOPPERS_CORTEX_M33
 /// @endcond

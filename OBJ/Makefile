@@ -335,6 +335,7 @@ $(OBJFILE): $(APPL_CFG) kernel_cfg.timestamp $(ALL_OBJS) $(LIBS_DEP)
 			-Wl,-Map=$(OBJNAME).map
 	$(NM) -n $(OBJFILE) > $(OBJNAME).syms
 	$(OBJCOPY) -O srec -S $(OBJFILE) $(OBJNAME).srec
+	$(OBJCOPY) -O binary -R.bss -S $(OBJFILE) $(OBJNAME).bin
 	$(CFG) --pass 3 --kernel asp $(INCLUDES) \
 				--rom-image $(OBJNAME).srec --symbol-table $(OBJNAME).syms \
 				-T $(TARGETDIR)/target_check.tf $(CFG_TABS) $<

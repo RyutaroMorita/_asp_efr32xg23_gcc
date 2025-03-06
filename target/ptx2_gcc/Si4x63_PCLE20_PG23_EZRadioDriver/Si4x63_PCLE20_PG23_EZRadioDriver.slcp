@@ -29,6 +29,8 @@ component:
 - {id: EFM32PG23B200F64IM40}
 - {id: clock_manager}
 - {id: device_init}
+- {id: emlib_iadc}
+- {id: emlib_vdac}
 - {id: si4463}
 - instance: [led_green, led_red]
   id: simple_led

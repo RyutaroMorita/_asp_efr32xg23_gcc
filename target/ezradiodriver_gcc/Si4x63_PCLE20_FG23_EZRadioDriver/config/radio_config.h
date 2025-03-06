@@ -55,8 +55,7 @@
 // Command:                  RF_GPIO_PIN_CFG
 // Description:              Configures the GPIO pins.
 */
-#define RF_GPIO_PIN_CFG 0x13, 0x20, 0x00, 0x20, 0x21, 0x00, 0x00, 0x00
-//#define RF_GPIO_PIN_CFG 0x13, 0x03, 0x03, 0x02, 0x03, 0x00, 0x00, 0x00	// PTX2
+#define RF_GPIO_PIN_CFG 0x13, 0x21, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00
 
 /*
 // Set properties:           RF_GLOBAL_XO_TUNE_2
@@ -293,15 +292,34 @@
 #define RF_MODEM_FREQ_DEV_0_1 0x11, 0x20, 0x01, 0x0C, 0xD4
 
 /*
-// Set properties:           RF_MODEM_TX_RAMP_DELAY_12
+// Set properties:           RF_MODEM_TX_FILTER_COEFF_8_12
 // Number of properties:     12
 // Group ID:                 0x20
-// Start ID:                 0x18
-// Default values:           0x01, 0x00, 0x08, 0x03, 0xC0, 0x00, 0x10, 0x20, 0x00, 0x00, 0x00, 0x4B, 
+// Start ID:                 0x0F
+// Default values:           0x67, 0x60, 0x4D, 0x36, 0x21, 0x11, 0x08, 0x03, 0x01, 0x01, 0x00, 0x08, 
 // Descriptions:
+//   MODEM_TX_FILTER_COEFF_8 - The 8th coefficient of TX spectral shaping filter.
+//   MODEM_TX_FILTER_COEFF_7 - The 7th coefficient of TX spectral shaping filter.
+//   MODEM_TX_FILTER_COEFF_6 - The 6th coefficient of TX spectral shaping filter.
+//   MODEM_TX_FILTER_COEFF_5 - The 5th coefficient of TX spectral shaping filter.
+//   MODEM_TX_FILTER_COEFF_4 - The 4th coefficient of TX spectral shaping filter.
+//   MODEM_TX_FILTER_COEFF_3 - The 3rd coefficient of TX spectral shaping filter.
+//   MODEM_TX_FILTER_COEFF_2 - The 2nd coefficient of TX spectral shaping filter.
+//   MODEM_TX_FILTER_COEFF_1 - The 1st coefficient of TX spectral shaping filter.
+//   MODEM_TX_FILTER_COEFF_0 - The 0th coefficient of TX spectral shaping filter.
 //   MODEM_TX_RAMP_DELAY - TX ramp-down delay setting.
 //   MODEM_MDM_CTRL - MDM control.
 //   MODEM_IF_CONTROL - Selects Fixed-IF, Scaled-IF, or Zero-IF mode of RX Modem operation.
+*/
+#define RF_MODEM_TX_FILTER_COEFF_8_12 0x11, 0x20, 0x0C, 0x0F, 0x67, 0x60, 0x4D, 0x36, 0x21, 0x11, 0x08, 0x03, 0x01, 0x01, 0x00, 0x08
+
+/*
+// Set properties:           RF_MODEM_IF_FREQ_2_12
+// Number of properties:     12
+// Group ID:                 0x20
+// Start ID:                 0x1B
+// Default values:           0x03, 0xC0, 0x00, 0x10, 0x20, 0x00, 0x00, 0x00, 0x4B, 0x06, 0xD3, 0xA0, 
+// Descriptions:
 //   MODEM_IF_FREQ_2 - the IF frequency setting (an 18-bit signed number).
 //   MODEM_IF_FREQ_1 - the IF frequency setting (an 18-bit signed number).
 //   MODEM_IF_FREQ_0 - the IF frequency setting (an 18-bit signed number).
@@ -311,19 +329,19 @@
 //   MODEM_IFPKD_THRESHOLDS - 
 //   MODEM_BCR_OSR_1 - RX BCR/Slicer oversampling rate (12-bit unsigned number).
 //   MODEM_BCR_OSR_0 - RX BCR/Slicer oversampling rate (12-bit unsigned number).
-*/
-#define RF_MODEM_TX_RAMP_DELAY_12 0x11, 0x20, 0x0C, 0x18, 0x01, 0x00, 0x08, 0x03, 0xC0, 0x00, 0x10, 0x20, 0x00, 0xE8, 0x00, 0x4B
-
-/*
-// Set properties:           RF_MODEM_BCR_NCO_OFFSET_2_12
-// Number of properties:     12
-// Group ID:                 0x20
-// Start ID:                 0x24
-// Default values:           0x06, 0xD3, 0xA0, 0x06, 0xD3, 0x02, 0xC0, 0x00, 0x00, 0x23, 0x83, 0x69, 
-// Descriptions:
 //   MODEM_BCR_NCO_OFFSET_2 - RX BCR NCO offset value (an unsigned 22-bit number).
 //   MODEM_BCR_NCO_OFFSET_1 - RX BCR NCO offset value (an unsigned 22-bit number).
 //   MODEM_BCR_NCO_OFFSET_0 - RX BCR NCO offset value (an unsigned 22-bit number).
+*/
+#define RF_MODEM_IF_FREQ_2_12 0x11, 0x20, 0x0C, 0x1B, 0x03, 0xC0, 0x00, 0x10, 0x20, 0x00, 0xE8, 0x00, 0x4B, 0x06, 0xD3, 0xA0
+
+/*
+// Set properties:           RF_MODEM_BCR_GAIN_1_12
+// Number of properties:     12
+// Group ID:                 0x20
+// Start ID:                 0x27
+// Default values:           0x06, 0xD3, 0x02, 0xC0, 0x00, 0x00, 0x23, 0x83, 0x69, 0x00, 0x40, 0xA0, 
+// Descriptions:
 //   MODEM_BCR_GAIN_1 - The unsigned 11-bit RX BCR loop gain value.
 //   MODEM_BCR_GAIN_0 - The unsigned 11-bit RX BCR loop gain value.
 //   MODEM_BCR_GEAR - RX BCR loop gear control.
@@ -333,21 +351,11 @@
 //   MODEM_AFC_WAIT - RX AFC loop wait time control.
 //   MODEM_AFC_GAIN_1 - Sets the gain of the PLL-based AFC acquisition loop, and provides miscellaneous control bits for AFC functionality.
 //   MODEM_AFC_GAIN_0 - Sets the gain of the PLL-based AFC acquisition loop, and provides miscellaneous control bits for AFC functionality.
-*/
-#define RF_MODEM_BCR_NCO_OFFSET_2_12 0x11, 0x20, 0x0C, 0x24, 0x06, 0xD3, 0xA0, 0x06, 0xD4, 0x02, 0x00, 0x00, 0x00, 0x23, 0x83, 0x6A
-
-/*
-// Set properties:           RF_MODEM_AFC_LIMITER_1_3
-// Number of properties:     3
-// Group ID:                 0x20
-// Start ID:                 0x30
-// Default values:           0x00, 0x40, 0xA0, 
-// Descriptions:
 //   MODEM_AFC_LIMITER_1 - Set the AFC limiter value.
 //   MODEM_AFC_LIMITER_0 - Set the AFC limiter value.
 //   MODEM_AFC_MISC - Specifies miscellaneous AFC control bits.
 */
-#define RF_MODEM_AFC_LIMITER_1_3 0x11, 0x20, 0x03, 0x30, 0x00, 0xD3, 0xA0
+#define RF_MODEM_BCR_GAIN_1_12 0x11, 0x20, 0x0C, 0x27, 0x06, 0xD4, 0x02, 0x00, 0x00, 0x00, 0x23, 0x83, 0x6A, 0x00, 0xD3, 0xA0
 
 /*
 // Set properties:           RF_MODEM_AGC_CONTROL_1
@@ -530,7 +538,7 @@
 //   PA_BIAS_CLKDUTY - Configuration of the PA Bias and duty cycle of the TX clock source.
 //   PA_TC - Configuration of PA ramping parameters.
 */
-#define RF_PA_MODE_4 0x11, 0x22, 0x04, 0x00, 0x08, 0x7F, 0x00, 0x1D
+#define RF_PA_MODE_4 0x11, 0x22, 0x04, 0x00, 0x08, 0x0F, 0x00, 0x1D
 
 /*
 // Set properties:           RF_SYNTH_PFDCP_CPFF_7
@@ -547,7 +555,6 @@
 //   SYNTH_LPFILT1 - Value of capacitors C1 and C3 in feed-forward path of loop filter.
 //   SYNTH_LPFILT0 - Bias current of the active amplifier in the feed-forward loop filter.
 */
-//#define RF_SYNTH_PFDCP_CPFF_7 0x11, 0x23, 0x07, 0x00, 0x34, 0x04, 0x0B, 0x04, 0x07, 0x70, 0x03
 #define RF_SYNTH_PFDCP_CPFF_7 0x11, 0x23, 0x07, 0x00, 0x25, 0x0A, 0x0A, 0x03, 0x1F, 0x7F, 0x03
 
 /*
@@ -614,9 +621,9 @@
         0x08, RF_PKT_CRC_SEED_31_24_4, \
         0x10, RF_MODEM_MOD_TYPE_12, \
         0x05, RF_MODEM_FREQ_DEV_0_1, \
-        0x10, RF_MODEM_TX_RAMP_DELAY_12, \
-        0x10, RF_MODEM_BCR_NCO_OFFSET_2_12, \
-        0x07, RF_MODEM_AFC_LIMITER_1_3, \
+        0x10, RF_MODEM_TX_FILTER_COEFF_8_12, \
+        0x10, RF_MODEM_IF_FREQ_2_12, \
+        0x10, RF_MODEM_BCR_GAIN_1_12, \
         0x05, RF_MODEM_AGC_CONTROL_1, \
         0x10, RF_MODEM_AGC_WINDOW_SIZE_12, \
         0x0E, RF_MODEM_RAW_CONTROL_10, \

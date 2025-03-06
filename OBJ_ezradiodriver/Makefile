@@ -141,7 +141,7 @@ ifndef OMIT_WARNING_ALL
   COPTS := $(COPTS) -Wall
 endif
 ifndef OMIT_OPTIMIZATION
-  COPTS := $(COPTS) -O2
+  COPTS := $(COPTS) -O2 -mno-unaligned-access
 endif  
 CDEFS := $(CDEFS)
 INCLUDES := -I. -I$(SRCDIR)/include -I$(SRCDIR)/arch -I$(SRCDIR) $(INCLUDES)
@@ -186,11 +186,11 @@ endif
 APPL_COBJS := $(APPL_COBJS) log_output.o vasyslog.o t_perror.o strerror.o syscalls.o \
 	dmadrv.o \
 	em_ldma.o \
-	em_timer.o \
-	ezradio_api_lib.o \
+	t_ezradio_api_lib.o \
 	ezradio_api_lib_add.o \
-	ezradio_comm.o \
+	t_ezradio_comm.o \
 	ezradio_hal.o \
+	t_ezradio_plugin_manager.o \
 	ezradio_receive_plugin.o \
 	ezradio_transmit_plugin.o \
 	ezradio_unmod_carrier_plugin.o \
@@ -209,9 +209,7 @@ APPL_COBJS := $(APPL_COBJS) log_output.o vasyslog.o t_perror.o strerror.o syscal
 	sl_sleeptimer_hal_sysrtc.o \
 	sl_spidrv_init.o \
 	sl_udelay.o \
-	spidrv.o \
-	t_ezradio_plugin_manager.o \
-	ustimer.o
+	spidrv.o
 
 APPL_CFLAGS =
 APPL_LIBS =
@@ -395,6 +393,7 @@ $(OBJFILE): $(APPL_CFG) kernel_cfg.timestamp $(ALL_OBJS) $(LIBS_DEP)
 			-Wl,-Map=$(OBJNAME).map
 	$(NM) -n $(OBJFILE) > $(OBJNAME).syms
 	$(OBJCOPY) -O srec -S $(OBJFILE) $(OBJNAME).srec
+	$(OBJCOPY) -O binary -R.bss -S $(OBJFILE) $(OBJNAME).bin
 	$(CFG) --pass 3 --kernel asp $(INCLUDES) \
 				--rom-image $(OBJNAME).srec --symbol-table $(OBJNAME).syms \
 				-T $(TARGETDIR)/target_check.tf $(CFG_TABS) $<
