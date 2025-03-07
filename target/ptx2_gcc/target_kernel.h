@@ -52,6 +52,6 @@
 /*
  *  チップで共通な定義
  */
-#include "arm_m_gcc/efr32xg23/chip_kernel.h"
+#include "efr32xg23_gcc/prc_kernel.h"
 
 #endif /* TOPPERS_TARGET_KERNEL_H */

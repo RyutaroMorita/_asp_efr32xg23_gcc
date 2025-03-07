@@ -15,7 +15,7 @@
 #undef default_int_handler
 #undef x_config_int
 #undef core_initialize
-#undeprc_e_terminate
+#undef core_terminate
 #undef bitpat_cfgint
 #undef set_exc_int_priority
 #undef enable_exc

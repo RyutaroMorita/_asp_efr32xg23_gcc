@@ -5,4 +5,4 @@ $
 $ 
 $  パス3のチップ依存のテンプレートのインクルード
 $ 
-$INCLUDE"arm_m_gcc/stm32f4xx_stm32cube/chip_check.tf"$
+$INCLUDE"efr32xg23_gcc/prc_check.tf"$

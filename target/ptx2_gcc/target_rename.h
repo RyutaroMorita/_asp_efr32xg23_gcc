@@ -21,6 +21,6 @@
 
 #endif /* TOPPERS_LABEL_ASM */
 
-#include "arm_m_gcc/stm32f4xx_stm32cube/chip_rename.h"
+#include "efr32xg23_gcc/prc_rename.h"
 
 #endif /* TOPPERS_TARGET_RENAME_H */

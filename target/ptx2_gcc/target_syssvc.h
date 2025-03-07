@@ -84,6 +84,6 @@ extern void	target_fput_log(char c);
 /*
  *  チップ共有のハードウェア資源の読み込み
  */
-#include "arm_m_gcc/efr32xg23/chip_syssvc.h"
+#include "efr32xg23_gcc/prc_syssvc.h"
 
 #endif /* TOPPERS_TARGET_SYSSVC_H */

@@ -163,8 +163,6 @@ target_exit(void)
 	while(1);
 }
 
-//static UART_HandleTypeDef UartHandle;
-
 void
 usart_early_init()
 {

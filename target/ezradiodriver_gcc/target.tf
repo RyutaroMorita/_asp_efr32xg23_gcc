@@ -5,4 +5,4 @@ $
 $ 
 $  チップ依存のテンプレートファイルのインクルード
 $ 
-$INCLUDE"arm_m_gcc/stm32f4xx_stm32cube/chip.tf"$
+$INCLUDE"efr32xg23_gcc/prc.tf"$
