@@ -52,6 +52,10 @@
 #include "em_eusart.h"
 #include "sl_board_control_config.h"
 
+
+// デバッガの動作のため .stack 領域を 0x20000000 より確保する必要がある
+STK_T _kernel_istack[COUNT_STK_T(DEFAULT_ISTKSZ)] __attribute__ ((section (".stack")));
+
 /*
  *  バーナ出力用のUARTの初期化
  */
@@ -79,6 +83,36 @@ hardware_init_hook(void) {
 void
 target_initialize(void)
 {
+  /* Secure app takes care of moving between the security states.
+   * SL_TRUSTZONE_SECURE MACRO is for secure access.
+   * SL_TRUSTZONE_NONSECURE MACRO is for non-secure access.
+   * When both the MACROS are not defined, during start-up below code makes sure
+   * that all the peripherals are accessed from non-secure address except SMU,
+   * as SMU is used to configure the trustzone state of the system. */
+#if !defined(SL_TRUSTZONE_SECURE) && !defined(SL_TRUSTZONE_NONSECURE) \
+  && defined(__TZ_PRESENT)
+  CMU->CLKEN1_SET = CMU_CLKEN1_SMU;
+
+  // config SMU to Secure and other peripherals to Non-Secure.
+  SMU->PPUSATD0_CLR = _SMU_PPUSATD0_MASK;
+#if defined (SEMAILBOX_PRESENT)
+  SMU->PPUSATD1_CLR = (_SMU_PPUSATD1_MASK & (~SMU_PPUSATD1_SMU & ~SMU_PPUSATD1_SEMAILBOX));
+#else
+  SMU->PPUSATD1_CLR = (_SMU_PPUSATD1_MASK & ~SMU_PPUSATD1_SMU);
+#endif
+
+  // SAU treats all accesses as non-secure
+#if defined(__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)
+  SAU->CTRL = SAU_CTRL_ALLNS_Msk;
+  __DSB();
+  __ISB();
+#else
+  #error "The startup code requires access to the CMSE toolchain extension to set proper SAU settings."
+#endif // __ARM_FEATURE_CMSE
+
+  CMU_ClockEnable(cmuClock_SMU, true);
+#endif //SL_TRUSTZONE_SECURE
+
 	/*
 	 *  HALによる初期化
 	 *  HAL_Init() : stm32f4xx_hal.c の内容から必要な初期化のみ呼び出す．

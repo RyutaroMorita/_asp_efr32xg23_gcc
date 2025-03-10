@@ -66,6 +66,10 @@
  *  デフォルトの非タスクコンテキスト用のスタック領域の定義
  */
 #define DEFAULT_ISTKSZ			(0x1000)		/* 4KByte */
+#ifndef TOPPERS_MACRO_ONLY
+extern STK_T _kernel_istack[COUNT_STK_T(DEFAULT_ISTKSZ)];
+#endif
+#define DEFAULT_ISTK        _kernel_istack
 
 /*
  *  微少時間待ちのための定義（本来はSILのターゲット依存部）

@@ -113,7 +113,12 @@ GCC_TARGET = arm-none-eabi
 #
 #  リンカスクリプトの定義
 #
+ifeq ($(DEBUGGER),JLINK)
+CDEFS := $(CDEFS) -DDEBUG_WITH_JLINK
+LDSCRIPT = $(SRCDIR)/target/$(BOARD)_$(TOOL)/$(BOARD)_debug.ld
+else
 LDSCRIPT = $(SRCDIR)/target/$(BOARD)_$(TOOL)/$(BOARD).ld
+endif
 
 #
 #  依存関係の定義

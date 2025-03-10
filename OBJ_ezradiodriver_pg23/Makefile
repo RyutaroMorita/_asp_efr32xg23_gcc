@@ -49,6 +49,7 @@ all:
 #  ターゲット略称の定義
 #
 TARGET = ptx2_gcc
+DEBUGGER = JLINK
 
 #
 #  プログラミング言語の定義

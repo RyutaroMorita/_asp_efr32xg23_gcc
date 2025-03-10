@@ -53,6 +53,10 @@
 //#include "sl_board_control_config.h"
 //#include "sl_mx25_flash_shutdown.h"
 
+
+// デバッガの動作のため .stack 領域を 0x20000000 より確保する必要がある
+STK_T _kernel_istack[COUNT_STK_T(DEFAULT_ISTKSZ)] __attribute__ ((section (".stack")));
+
 /*
  *  バーナ出力用のUARTの初期化
  */
